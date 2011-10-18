@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kowalski", "kowalski\kowalski.vcproj", "{6B83EEC4-7C8C-4D21-BA5D-CE75C34F78F8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kowalski_demo", "kowalski_demo\kowalski_demo.vcproj", "{8867E9BE-F587-43D4-A5DC-FF6FA9254807}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B83EEC4-7C8C-4D21-BA5D-CE75C34F78F8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6B83EEC4-7C8C-4D21-BA5D-CE75C34F78F8}.Debug|Win32.Build.0 = Debug|Win32
+		{6B83EEC4-7C8C-4D21-BA5D-CE75C34F78F8}.Release|Win32.ActiveCfg = Release|Win32
+		{6B83EEC4-7C8C-4D21-BA5D-CE75C34F78F8}.Release|Win32.Build.0 = Release|Win32
+		{8867E9BE-F587-43D4-A5DC-FF6FA9254807}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8867E9BE-F587-43D4-A5DC-FF6FA9254807}.Debug|Win32.Build.0 = Debug|Win32
+		{8867E9BE-F587-43D4-A5DC-FF6FA9254807}.Release|Win32.ActiveCfg = Release|Win32
+		{8867E9BE-F587-43D4-A5DC-FF6FA9254807}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,240 @@
+<project name="Kowalski" default="dist" basedir=".">
+    <description>
+        Kowalski.
+    </description>
+
+    <!-- ==================================== -->
+    <!-- set global properties for this build -->
+    <!-- ==================================== -->
+    <!-- the location of the kowalski java source -->
+    <property name="src.java" location="src/java"/>
+    <!-- the location of the kowalski java test source -->
+    <property name="src.test" location="test/java"/>
+
+    <!-- the master resource directory-->
+    <property name="demodata.master" location="res/demodata/master"/>
+    <!-- the location of build assets-->
+    <property name="demodata.final" location="res/demodata/final"/>
+
+    <!-- this is where compiled java classes go-->
+    <property name="build" location="build/java"/>
+    <!-- this is where compiled java test classes go-->
+    <property name="build.test" location="build/javatest"/>
+
+    <!-- the directory to put final distributable binaries in-->
+    <property name="dist.dir"  location="dist"/>
+
+    <!-- the location of external library jars -->
+    <property name="lib.dir" location="lib"/>
+    <!-- the location of platform specific java bindings Kowalski engine libs. -->
+    <property name="enginelib.dir" location="dist"/>
+    <!-- the location of generated html documentation -->
+    <property name="javadoc.dir" location="doc/javadoc"/>
+
+
+    <!-- ==================================== -->
+    <!-- taskdefs                             -->
+    <!-- ==================================== -->
+
+    <!-- Handles turning jar files into exe files for windows.-->
+    <taskdef name="jsmoothgen"
+             classname="net.charabia.jsmoothgen.ant.JSmoothGen"
+             classpath="${lib.dir}/jsmooth/jsmoothgen-ant.jar"/>
+
+    <!-- Handles packaging jar files into application bundles for OSX-->
+    <taskdef name="jarbundler"
+             classname="net.sourceforge.jarbundler.JarBundler"
+             classpath="${lib.dir}/jarbundler/jarbundler-2.1.0.jar"/>
+
+    <!-- XML schema compiler. Generates java classes from an xsd schema.-->
+    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+        <classpath>
+            <fileset dir="${lib.dir}/jaxb" includes="*.jar" />
+        </classpath>
+    </taskdef>
+
+    <!-- A task for building wave banks and engine data binaries.-->
+    <taskdef name="kowalskibuilder" classname="kowalski.tools.data.KowalskiBinaryBuilderAntTask">
+        <classpath>
+            <pathelement location="${lib.dir}/kowalski/kowalskitools.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!-- Builds demo engine data and wave banks.-->
+    <target name="builddemodata">
+        <kowalskibuilder projectFile="${demodata.master}/demoproject.xml"
+                         engineDataFile="${demodata.final}/demoproject.kwl"
+                         waveBankDir="${demodata.final}">
+            
+        </kowalskibuilder>
+    </target>
+
+    <!-- ==================================== -->
+    <!-- define targets                       -->
+    <!-- ==================================== -->
+
+    <!-- Runs java unit tests-->
+    <target name="test">
+        <junit showoutput="true"
+               printsummary="on"
+               haltonerror="false"
+               fork="true"
+               forkmode="once">
+            <classpath>
+                <pathelement location="${lib.dir}/junit/junit.jar"/>
+                <pathelement location="${build.test}"/>
+                <pathelement location="${build}"/>
+            </classpath>
+            <formatter usefile="false" type="brief"/>  
+            <batchtest fork="yes">
+                <fileset dir="${src.test}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>        
+    </target>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
+        <mkdir dir="${build.test}"/>
+    </target>
+
+    <target name="compile" depends="init"
+            description="compile the source " >
+        <!-- Compile source -->
+        <javac srcdir="${src.java}" destdir="${build}" debug="true" debuglevel="lines,source"/>
+
+        <!-- Copy the project xml schema to the build folder -->
+        <copy file="${src.java}/kowalski/tools/data/xml/kowalski1.0.xsd"
+              tofile="${build}/kowalski/tools/data/xml/kowalski1.0.xsd"/>
+
+        <!-- Copy icons to build folder -->
+        <copy todir="${build}/kowalski/util/icons">
+            <fileset dir="${src.java}/kowalski/util/icons">
+                <include name="**/*.png"/>
+            </fileset>
+        </copy>
+
+        <!-- Compile test source -->
+        <javac srcdir="${src.test}" destdir="${build.test}" debug="true" debuglevel="lines,source">
+            <classpath>
+                <pathelement path="${build}"/>
+                <pathelement location="${lib.dir}/junit/junit.jar"/>
+            </classpath>
+        </javac>
+        
+        <!-- Copy test xml resources to build folder  -->
+        <copy todir="${build.test}/kowalski/tools/data">
+            <fileset dir="${src.test}/kowalski/tools/data">
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile-xsd"
+            description="generate java code from the xml schema(s)" >
+        <xjc schema="${src.java}/kowalski/tools/data/xml/kowalski1.0.xsd"
+             destdir="${src.java}"
+             package="kowalski.tools.data.xml"/>
+    </target>
+
+    <target name="javadoc"
+            description="generate documentation" >
+        <javadoc destdir="${javadoc.dir}">
+            <sourcepath path="${src.java}" />
+        </javadoc>
+    </target>
+
+    <!-- Creates distributable binaries -->
+    <target name="dist" depends="compile"
+            description="generate the distribution" >
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist.dir}"/>
+
+        <echo>Creating Kowalski Editor jar</echo>
+        <jar jarfile="${dist.dir}/kowalskieditor.jar">
+            <!-- Put everything in the build folder into the editor jar file -->
+            <fileset dir="${build}"/>
+            <!-- Put platform specific native libs in the jar too.-->
+            <fileset dir="${enginelib.dir}">
+                 <include name="kowalski_java.jnilib"/>
+             </fileset>
+            <manifest>
+                <attribute name="Main-Class" value="kowalski.editor.KowalskiEditor" />
+            </manifest>
+        </jar>
+
+        <!-- Wrap the editor jar in an exe for windows distribution -->
+        <echo>Creating Kowalski Editor .exe wrapper</echo>
+        <jsmoothgen project="jsmoothproject.jsmooth"
+                    skeletonroot="${lib.dir}/jsmooth/skeletons"/>
+
+        <!-- Create an editor application bundle for mac distribution -->
+        <echo>Creating Kowalski Editor mac application bundle</echo>
+        <jarbundler dir="${dist.dir}"
+                    name="Kowalski Editor"
+                    icon="res/artwork/icon.icns"
+                    mainclass="kowalski.editor.KowalskiEditor"
+                    jar="${dist.dir}/kowalskieditor.jar" />
+
+        <!-- Create a kowalski tools jar...-->
+        <echo>Creating Kowalski tools jar</echo>
+        <jar jarfile="${dist.dir}/kowalskitools.jar">
+            <fileset dir="${build}">
+                 <include name="kowalski/tools/**/*"/>
+                 <include name="kowalski/util/**/*"/>
+             </fileset>
+        </jar>
+        <!-- ... and copy it to the lib folder, since this ant script uses
+             the jar to build demo data and the clean target wipes the dist folder. -->
+        <copy todir="${lib.dir}/kowalski">
+            <fileset dir="${dist.dir}">
+                <include name="kowalskitools.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- Create a jar with the java bindings classes-->
+        <echo>Creating Kowalski bindnings jar</echo>
+        <jar jarfile="${dist.dir}/kowalskiengine.jar">
+            <fileset dir="${build}">
+                 <include name="kowalski/*.class"/>
+             </fileset>
+        </jar>
+
+        <!-- Create a java bindings demo jar with all classes, resources
+             and native libs needed for standalone execution. -->
+        <echo>Creating Kowalski bindnings demo jar</echo>
+        <jar jarfile="${dist.dir}/kowalskidemo.jar">
+            <fileset dir="${build}">
+                 <include name="kowalski/*.class"/>
+                 <include name="kowalski/demo/**/*.*"/>
+                 <include name="kowalski/util/**/*.*"/>
+             </fileset>
+             <fileset dir="${enginelib.dir}">
+                 <include name="kowalski_java.jnilib"/>
+             </fileset>
+             <fileset dir="${demodata.final}">
+                 <include name="demoproject.kwl"/>
+                 <include name="music.kwb"/>
+             </fileset>
+             <manifest>
+                <attribute name="Main-Class" value="kowalski.demo.KowalskiJavaBindingsDemo" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean"
+            description="clean up" >
+        <delete dir="${build}"/>
+
+        <delete>
+            <fileset dir="${dist.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </delete>
+
+    </target>
+</project>

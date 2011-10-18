@@ -1,0 +1,558 @@
+<html>
+    <head>
+    </head>
+    <body>
+    <p>This package containins tools for reading, writing, validating and converting
+        Kowalski data. The Kowalski Editor uses a human readable (and editable) XML representation of
+        high level non-audio data, e.g events, event groups and mix presets. A
+        binary version of this non-audio data is used in the Kowalski runtime along with
+        audio data stored in wave bank binaries.
+    </p>
+
+<h3>Binary Files and Data Types</h3>
+<p>
+There are two kinds of Kowalski binary data: engine data and wave bank data. Engine
+data binaries contain non-audio data such as event definitions and sound definitions
+whereas wave bank binaries contain actual audio waveforms and are typically much larger
+than engine data files. The different data types allowed to occur in these binary
+files are given in the table below. 
+</p>
+<table border="1">
+    <tr>
+        <th>Data types</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">int32</td>
+                    <td>An unsiged 32 bit integer. Big endian byte order.</td>
+                </tr>
+                <tr>
+                    <td class="type">float32</td>
+                    <td>A 32 bit IEEE floating point number. Big endian byte order.</td>
+                </tr>
+                <tr>
+                    <td class="type">unsigned char[i]</td>
+                    <td>A sequence of i unsigned chars.</td>
+                </tr>
+                <tr>
+                    <td class="type">string</td>
+                    <td>An int32 followed by that many unsigned chars representing the ASCII characters of the string.</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<p>Both wave bank and engine data files begin with a file identifier byte sequence. 
+This sequence is designed to catch a number of common file transfer errors and was 
+inspired by (or stolen from, actually) the <a href="http://jcp.org/en/jsr/detail?id=184">M3G</a> binary format. 
+The anatomy of the identifiers is detailed in the following table.
+<table border="1">
+    <tr>
+        <td>
+            byte 1
+        </td>
+        <td>
+            0xAB
+        </td>
+        <td>
+            Chosen to be a non-ASCII value catch attempts to read text files.
+            Also catches bad file transfers that clear bit 7.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            bytes 2-4
+        </td>
+        <td>
+            'K', 'W', 'L' for engine data and 'K', 'W', 'B' for wave banks.
+        </td>
+        <td>
+            A human readable format description.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            byte 5
+        </td>
+        <td>
+            0xBB
+        </td>
+        <td>
+            
+        </td>
+    </tr>
+    <tr>
+        <td>
+            bytes 6-7
+        </td>
+        <td>
+            0x0D, 0x0A
+        </td>
+        <td>
+            A CR-LF sequence which catches bad file transfers that alter newline sequences.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            byte 8
+        </td>
+        <td>
+            0x1A
+        </td>
+        <td>
+           A control-Z character, which stops file display under MS-DOS, and
+          further reduces the risk that a text file will be falsely recognised.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            byte 9
+        </td>
+        <td>
+            0x0A
+        </td>
+        <td>
+            A final line feed, which checks for the inverse of the CR-LF translation problem.
+        </td>
+    </tr>
+</table>
+
+<h3>The Engine Data Binary Format</h3>
+<p>A Kowalski engine data file starts with a file identifier followed by
+five chunks, each beginning with an int32 ID
+and an int32 specifying the following number of bytes in the chunk. The chunk IDs are magic
+numbers chosen so that the bytes (read from high to low) spell out a human readable description.
+For example, the event definitions chunk ID is 0x73747665 or equivalently 'evts'. The structure
+of an engine data binary file is defined in the following table (the chunks always occur in this order).
+</p>
+<table border="1">
+    <tr>
+        <th>File Identifier</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">unsigned char[9]</td>
+                    <td>File identifier: 0xAB, 'K', 'W', 'L',
+                    0xBB, 0x0D, 0x0A, 0x1A, 0x0A</td>
+
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <tr>
+        <th>Wave Bank Chunk</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk ID (0x736b6277, 'wbks')</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk size in bytes</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Total number of audio data entries</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Number of wave banks</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="type">string</td>
+                                <td>ID of wave bank i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Number of audio data items in wave bank i</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <table border="0">
+                                        <tr>
+                                            <td class="type">string</td>
+                                            <td>File name of entry j in wave bank i</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <th>Mix Buses Chunk</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk ID (0x7362786d, 'mxbs')</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk size in bytes</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Number of mix buses</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="type">string</td>
+                                <td>ID of mix bus i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>The number of sub buses of mix bus i</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <table border="0">
+                                        <tr>
+                                            <td class="type">int32</td>
+                                            <td>Index of sub bus j of mix bus i</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr>
+        <th>Mix Presets Chunk</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk ID (0x7270786d, 'mxpr')</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk size in bytes</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Number of mix presets</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="type">string</td>
+                                <td>ID of mix preset i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Default flag (0 or 1)</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <table border="0">
+                                        <tr>
+                                            <td class="type">int32</td>
+                                            <td>Mix bus index of mix preset i</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="type">float32</td>
+                                            <td>Left gain of mix preset i</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="type">float32</td>
+                                            <td>Right gain of mix preset i</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="type">float32</td>
+                                            <td>Pitch of mix preset i</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr>
+        <th>Sounds Chunk</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk ID (0x73646e73, 'snds')</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk size in bytes</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Number of sound definitions</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Playback count of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Defer stop flag of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Gain of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Gain variation of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Pitch of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Pitch variation of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Playback mode of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Number of audio data items of sound definition i</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <table border="0">
+                                        <tr>
+                                            <td class="type">int32</td>
+                                            <td>Index of wave bank of audio data item j of sound definition i</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="type">int32</td>
+                                            <td>Index of audio data item j into the wave bank audio data array.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <tr>
+        <th>Events Chunk</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk ID (0x73747665, 'evts')</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Chunk size in bytes</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Number of event definitions</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="type">string</td>
+                                <td>ID of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Instance count of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Gain of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Pitch of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Inner cone angle of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Inner cone gain of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">float32</td>
+                                <td>Outer cone angle of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Mix bus index of event definition i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Positional flag of event definition i (0 or 1)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Sound definition index of event definition i (non-streaming events only)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Retrigger mode of event definition i (non-streaming events only)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Wave bank index of event definition i (streaming events only)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Audio data item index of event definition i (streaming events only)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Loop flag of definition i (streaming events only)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Num referenced wave banks</td>
+                            </tr>
+                            
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <table border="0">
+                                        <tr>
+                                            <td class="type">int32</td>
+                                            <td>Index of referenced wave bank j</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+
+</table>
+
+<h3>The Wave Bank Binary Format</h3>
+
+<table border="1">
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">unsigned char[9]</td>
+                    <td><td>File identifier: 0xAB, 'K', 'W', 'B',
+                    0xBB, 0x0D, 0x0A, 0x1A, 0x0A</td></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <tr>
+        <th>Wave Bank Chunk</th>
+    </tr>
+    <tr>
+        <td>
+            <table border="0">
+                <tr>
+                    <td class="type">string</td>
+                    <td>Wave bank ID</td>
+                </tr>
+                <tr>
+                    <td class="type">int32</td>
+                    <td>Number of audio data entries</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="type">string</td>
+                                <td>File name of entry i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Encoding of entry i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Stream flag of entry i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Number of channels flag of entry i (non-zero for PCM, zero otherwise)</td>
+                            </tr>
+                            <tr>
+                                <td class="type">int32</td>
+                                <td>Number of audio data bytes for entry i</td>
+                            </tr>
+                            <tr>
+                                <td class="type">unsigned char[]</td>
+                                <td>Audio data. If the encoding is PCM, this is just the interleaved 16 bit samples.
+                                    For non-PCM data, this is the entire audio file.</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                
+            </table>
+        </td>
+    </tr>
+    
+ 
+</table>
+</body>
+</html>
