@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="Kowalski-IDE">
+    <property name="project.dir" value="../"/>
+    <property name="ant.script" value="${project.dir}/build.xml"/>
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
+    <target name="run-selected-file-in-editor">
+        <fail unless="run.class">Must set property 'run.class'</fail>
+        <java classname="${run.class}" failonerror="true" fork="true">
+            <classpath>
+                <pathelement path="${project.dir}/build/editor"/>
+            </classpath>
+        </java>
+    </target>
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
+    <!--target name="debug-selected-file-in-editor">
+        <fail unless="debug.class">Must set property 'debug.class'</fail>
+        <path id="cp">
+            <pathelement path="${project.dir}/src/editor:${project.dir}/src/bindings/java"/>
+        </path>
+        <nbjpdastart addressproperty="jpda.address" name="Kowalski" transport="dt_socket">
+            <classpath>
+                <pathelement path="${project.dir}/build/editor"/>
+            </classpath>
+        </nbjpdastart>
+        <java classname="${debug.class}" fork="true">
+            <classpath>
+                <pathelement path="${project.dir}/build/editor"/>
+            </classpath>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+        </java>
+    </target-->
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
+    <target name="run-selected-file-in-java">
+        <fail unless="run.class">Must set property 'run.class'</fail>
+        <java classname="${run.class}" failonerror="true" fork="true">
+            <classpath>
+                <pathelement path="${project.dir}/build/java"/>
+            </classpath>
+        </java>
+    </target>
+</project>
