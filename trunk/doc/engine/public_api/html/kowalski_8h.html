@@ -163,6 +163,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kowalski_8h.html#acdea0da0f954e93e2e88dda3345454a1">kwlWaveBankUnload</a> (<a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> handle)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kowalski_8h.html#ac1b7b308d8c0331850840f277599b3f8">kwlWaveBankUnloadBlocking</a> (<a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> handle)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kowalski_8h.html#a42ff5d8ec5f5d5251f7e7eae79262fe6">kwlWaveBankIsLoaded</a> (<a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> handle)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kowalski_8h.html#a3e057fb535ba50baa4ef8e081b8179b1">kwlWaveBankIsReferencedByPlayingEvent</a> (<a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> handle)</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Engine</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp7bfa30721c5e726ff17e3f972237a82c"></a> Basic engine functionality. </p>
 </div></td></tr>
@@ -2527,6 +2528,41 @@ KWL_CONSTANT: <code>gain = 1</code>. </li>
 
 </div>
 </div>
+<a class="anchor" id="a3e057fb535ba50baa4ef8e081b8179b1"></a><!-- doxytag: member="kowalski.h::kwlWaveBankIsReferencedByPlayingEvent" ref="a3e057fb535ba50baa4ef8e081b8179b1" args="(kwlWaveBankHandle handle)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kwlWaveBankIsReferencedByPlayingEvent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a>&nbsp;</td>
+          <td class="paramname"> <em>handle</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Checks if any of the audio items of a given wave bank are referenced by any currently playing events. </p>
+<p><b>Error codes:</b> </p>
+<ul>
+<li>
+<code>KWL_ENGINE_IS_NOT_INITIALIZED</code> if the Kowalski engine has not been initialized. </li>
+<li>
+<code>KWL_ENGINE_DATA_NOT_LOADED</code> if no engine data is currently loaded. </li>
+<li>
+<code>KWL_INVALID_WAVE_BANK_HANDLE</code> if the given handle does not correspond to a wave bank. </li>
+</ul>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>handle</em>&nbsp;</td><td>A handle corresponding to the wave bank to check. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A non-zero integer if one or more audio data items are currently being used, zero otherwise. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ad428b9940239be9af91dced90537d64b"></a><!-- doxytag: member="kowalski.h::kwlWaveBankLoad" ref="ad428b9940239be9af91dced90537d64b" args="(const char *const fileName)" -->
 <div class="memitem">
 <div class="memproto">
@@ -2675,7 +2711,7 @@ KWL_CONSTANT: <code>gain = 1</code>. </li>
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-22643421-1']);
+  _gaq.push(['_setAccount', 'UA-26424920-2']);
   _gaq.push(['_trackPageview']);
 
   (function() {

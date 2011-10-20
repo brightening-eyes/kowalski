@@ -140,6 +140,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#a368ae742a4d34f1f8ac2c099f1cd6447">kwlSoundEngine_freeWaveBankData</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#a23b9c8c5d44927666c85d9a0038c91de">kwlSoundEngine_loadWaveBank</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine, const char *const waveBankFile, <a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> *handle)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#adda6939ec9f2490b4d9e7e19ea84ad21">kwlSoundEngine_waveBankIsLoaded</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine, <a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> handle, int *isLoaded)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#a37eb75f27bad5ba90d175609d4b3f588">kwlSoundEngine_waveBankIsReferencedByPlayingEvent</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine, <a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> handle, int *isReferenced)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#a0f1d55a2d1a02d647d23b2faa0a041b4">kwlSoundEngine_requestUnloadWaveBank</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine, <a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a> waveBankHandle, int blockUntilUnloaded)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#aee1aa76593ad4c4eb9e562469cbb9210">kwlSoundEngine_unloadWaveBank</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine, <a class="el" href="structkwl_wave_bank.html">kwlWaveBank</a> *waveBank)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__soundengine_8h.html#ae91a45b3d3031e365a2bfb6e12554fa5">kwlSoundEngine_getNumFramesMixed</a> (<a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *engine, unsigned int *numFrames)</td></tr>
@@ -2485,6 +2486,39 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 </div>
 </div>
+<a class="anchor" id="a37eb75f27bad5ba90d175609d4b3f588"></a><!-- doxytag: member="kwl_soundengine.h::kwlSoundEngine_waveBankIsReferencedByPlayingEvent" ref="a37eb75f27bad5ba90d175609d4b3f588" args="(kwlSoundEngine *engine, kwlWaveBankHandle handle, int *isReferenced)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a> kwlSoundEngine_waveBankIsReferencedByPlayingEvent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structkwl_sound_engine.html">kwlSoundEngine</a> *&nbsp;</td>
+          <td class="paramname"> <em>engine</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kowalski_8h.html#a6d205f22f268b4d8f2bab42dcfbf828d">kwlWaveBankHandle</a>&nbsp;</td>
+          <td class="paramname"> <em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&nbsp;</td>
+          <td class="paramname"> <em>isReferenced</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 </div>
 <!--- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -2503,7 +2537,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-22643421-1']);
+  _gaq.push(['_setAccount', 'UA-26424920-2']);
   _gaq.push(['_trackPageview']);
 
   (function() {
