@@ -60,21 +60,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <br/>
 &nbsp;&nbsp;<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5ac45f99001a0daee3f84a31d067b47eef">KWL_EVENT_RETRIGGER</a>, 
 <a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5aec0464929f67c97d17ad43ef3ade85c8">KWL_EVENT_STOPPED</a>, 
-<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a8e9eefaf7f20a3a1d72ec61a8e2b6343">KWL_STOP_ALL_EVENTS</a>, 
 <a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a25e1c0b2d2747d4c50512d2d0236163e">KWL_STOP_ALL_EVENTS_REFERENCING_WAVE_BANK</a>, 
+<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a4d119977b68b927be29eeb4eced12ba1">KWL_UNLOAD_WAVEBANK</a>, 
 <br/>
-&nbsp;&nbsp;<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a4d119977b68b927be29eeb4eced12ba1">KWL_UNLOAD_WAVEBANK</a>, 
-<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5ad1ce95445e4d8848c7b125dee10f9fda">KWL_FREEFORM_EVENT_STOP</a>, 
+&nbsp;&nbsp;<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5ad1ce95445e4d8848c7b125dee10f9fda">KWL_FREEFORM_EVENT_STOP</a>, 
 <a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a721359d8304c2ceb36500855f956432c">KWL_UNLOAD_FREEFORM_EVENT</a>, 
 <a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a80ddfa35855dcdeb4c2063ad1f694966">KWL_ALL_EVENTS_STOPPED</a>, 
+<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a08ab370d6a64bb35de29957c7f7a74fe">KWL_PREPARE_ENGINE_DATA_UNLOAD</a>, 
 <br/>
-&nbsp;&nbsp;<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a08ab370d6a64bb35de29957c7f7a74fe">KWL_PREPARE_ENGINE_DATA_UNLOAD</a>, 
-<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a5aeb4e5bfb57c6d990db120a0bf06930">KWL_UNLOAD_ENGINE_DATA</a>, 
+&nbsp;&nbsp;<a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a5aeb4e5bfb57c6d990db120a0bf06930">KWL_UNLOAD_ENGINE_DATA</a>, 
 <a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5a3d4683c02bdab7de7d2a12813470de47">KWL_SET_MASTER_BUS</a>
 <br/>
  }</td></tr>
 <tr><td colspan="2"><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__messagequeue_8h.html#a2d9ae7810f9b7d34a8cd2bdcb40f5de9">kwlMessageQueue_init</a> (<a class="el" href="structkwl_message_queue.html">kwlMessageQueue</a> *queue)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa18f849a882f63283c0a51845b75f0cc"></a><!-- doxytag: member="kwl_messagequeue.h::kwlMessageQueue_clear" ref="aa18f849a882f63283c0a51845b75f0cc" args="(kwlMessageQueue *queue)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>kwlMessageQueue_clear</b> (<a class="el" href="structkwl_message_queue.html">kwlMessageQueue</a> *queue)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__messagequeue_8h.html#a1ce1d44ea32dcea5a1e728d4f6a05c96">kwlMessageQueue_flushTo</a> (<a class="el" href="structkwl_message_queue.html">kwlMessageQueue</a> *srcQueue, <a class="el" href="structkwl_message_queue.html">kwlMessageQueue</a> *destQueue)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="kwl__messagequeue_8h.html#a6fdcd713f50fce1c6a0b3e113a95448b">kwlMessageQueue_addMessage</a> (<a class="el" href="structkwl_message_queue.html">kwlMessageQueue</a> *queue, <a class="el" href="kwl__messagequeue_8h.html#a88947f5f58d3c4b11b589369a0bec7e5">kwlMessageType</a> type, void *data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a75866c09d31afda03055b9b62274518b"></a><!-- doxytag: member="kwl_messagequeue.h::kwlMessageQueue_addMessageWithParam" ref="a75866c09d31afda03055b9b62274518b" args="(kwlMessageQueue *queue, kwlMessageType type, void *data, float param)" -->
@@ -111,9 +112,6 @@ int&nbsp;</td><td class="memItemRight" valign="bottom"><b>kwlMessageQueue_addMes
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a88947f5f58d3c4b11b589369a0bec7e5aec0464929f67c97d17ad43ef3ade85c8"></a><!-- doxytag: member="KWL_EVENT_STOPPED" ref="a88947f5f58d3c4b11b589369a0bec7e5aec0464929f67c97d17ad43ef3ade85c8" args="" -->KWL_EVENT_STOPPED</em>&nbsp;</td><td>
 <p>A notification from the mixer thread that an event just finished playing. </p>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a88947f5f58d3c4b11b589369a0bec7e5a8e9eefaf7f20a3a1d72ec61a8e2b6343"></a><!-- doxytag: member="KWL_STOP_ALL_EVENTS" ref="a88947f5f58d3c4b11b589369a0bec7e5a8e9eefaf7f20a3a1d72ec61a8e2b6343" args="" -->KWL_STOP_ALL_EVENTS</em>&nbsp;</td><td>
-<p>Stops all events currently playing. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a88947f5f58d3c4b11b589369a0bec7e5a25e1c0b2d2747d4c50512d2d0236163e"></a><!-- doxytag: member="KWL_STOP_ALL_EVENTS_REFERENCING_WAVE_BANK" ref="a88947f5f58d3c4b11b589369a0bec7e5a25e1c0b2d2747d4c50512d2d0236163e" args="" -->KWL_STOP_ALL_EVENTS_REFERENCING_WAVE_BANK</em>&nbsp;</td><td>
 <p>Stops all events referencing audio data in a given wave bank. Sent from the engine to the mixer. </p>
@@ -266,7 +264,7 @@ int&nbsp;</td><td class="memItemRight" valign="bottom"><b>kwlMessageQueue_addMes
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-22643421-1']);
+  _gaq.push(['_setAccount', 'UA-26424920-2']);
   _gaq.push(['_trackPageview']);
 
   (function() {

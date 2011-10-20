@@ -218,40 +218,42 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00946"></a>00946     
 <a name="l00965"></a>00965 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a42ff5d8ec5f5d5251f7e7eae79262fe6">kwlWaveBankIsLoaded</a>(kwlWaveBankHandle handle);    
 <a name="l00966"></a>00966 
-<a name="l00969"></a>00969 <span class="comment">/************************************************************************/</span>
-<a name="l00982"></a>00982 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a0457f71c9b529e4b0772b106077009c6">kwlIsEngineInitialized</a>();
-<a name="l00983"></a>00983 
-<a name="l00997"></a>00997 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#af44d79247c71e5f1c313a7049eb1dee1">kwlDeinitialize</a>();
-<a name="l00998"></a>00998         
-<a name="l01016"></a>01016 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a0b7f4733fb5b4d53b726abed28574f78">kwlInitialize</a>(<span class="keywordtype">int</span> sampleRate, <span class="keywordtype">int</span> numOutputChannels, <span class="keywordtype">int</span> numInputChannels, <span class="keywordtype">int</span> bufferSize);
-<a name="l01017"></a>01017     
-<a name="l01034"></a>01034 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a0b88ec2bab95ab503fa6df96d0100973">kwlEngineDataLoad</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> path);
-<a name="l01035"></a>01035 
-<a name="l01051"></a>01051 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a985da3b287094b65b6b18b34fa9f919b">kwlEngineDataUnload</a>();
-<a name="l01052"></a>01052 
-<a name="l01066"></a>01066 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a057ee9a011b67a85488e7f445f7e281e">kwlEngineDataIsLoaded</a>();
-<a name="l01067"></a>01067     
-<a name="l01078"></a>01078 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a5de2493a4a7511232606ce5c6afaafb9">kwlMixerResume</a>();
-<a name="l01079"></a>01079 
-<a name="l01090"></a>01090 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a8a045bbd23cfa548b94353f29a11509d">kwlMixerPause</a>();
-<a name="l01091"></a>01091 
-<a name="l01106"></a>01106 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a5e3e04ead6125e90064d16eaeecd18a8">kwlLevelMeteringSetEnabled</a>(<span class="keywordtype">int</span> enabled);    
-<a name="l01107"></a>01107     
-<a name="l01122"></a>01122 <span class="keywordtype">float</span> <a class="code" href="kowalski_8h.html#a49fb5bf54eefaf831c43681430cf69e3">kwlGetLevelLeft</a>();
-<a name="l01123"></a>01123 
-<a name="l01138"></a>01138 <span class="keywordtype">float</span> <a class="code" href="kowalski_8h.html#af88998e67ad4286fb01c54d9a9e175f4">kwlGetLevelRight</a>();
+<a name="l00981"></a>00981 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a3e057fb535ba50baa4ef8e081b8179b1">kwlWaveBankIsReferencedByPlayingEvent</a>(kwlWaveBankHandle handle);
+<a name="l00982"></a>00982     
+<a name="l00985"></a>00985 <span class="comment">/************************************************************************/</span>
+<a name="l00998"></a>00998 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a0457f71c9b529e4b0772b106077009c6">kwlIsEngineInitialized</a>();
+<a name="l00999"></a>00999 
+<a name="l01013"></a>01013 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#af44d79247c71e5f1c313a7049eb1dee1">kwlDeinitialize</a>();
+<a name="l01014"></a>01014         
+<a name="l01032"></a>01032 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a0b7f4733fb5b4d53b726abed28574f78">kwlInitialize</a>(<span class="keywordtype">int</span> sampleRate, <span class="keywordtype">int</span> numOutputChannels, <span class="keywordtype">int</span> numInputChannels, <span class="keywordtype">int</span> bufferSize);
+<a name="l01033"></a>01033     
+<a name="l01050"></a>01050 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a0b88ec2bab95ab503fa6df96d0100973">kwlEngineDataLoad</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> path);
+<a name="l01051"></a>01051 
+<a name="l01067"></a>01067 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a985da3b287094b65b6b18b34fa9f919b">kwlEngineDataUnload</a>();
+<a name="l01068"></a>01068 
+<a name="l01082"></a>01082 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a057ee9a011b67a85488e7f445f7e281e">kwlEngineDataIsLoaded</a>();
+<a name="l01083"></a>01083     
+<a name="l01094"></a>01094 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a5de2493a4a7511232606ce5c6afaafb9">kwlMixerResume</a>();
+<a name="l01095"></a>01095 
+<a name="l01106"></a>01106 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a8a045bbd23cfa548b94353f29a11509d">kwlMixerPause</a>();
+<a name="l01107"></a>01107 
+<a name="l01122"></a>01122 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#a5e3e04ead6125e90064d16eaeecd18a8">kwlLevelMeteringSetEnabled</a>(<span class="keywordtype">int</span> enabled);    
+<a name="l01123"></a>01123     
+<a name="l01138"></a>01138 <span class="keywordtype">float</span> <a class="code" href="kowalski_8h.html#a49fb5bf54eefaf831c43681430cf69e3">kwlGetLevelLeft</a>();
 <a name="l01139"></a>01139 
-<a name="l01156"></a>01156 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a1322fabd8c575b92cf90e391e0c2013a">kwlHasClipped</a>();
-<a name="l01157"></a>01157     
-<a name="l01171"></a>01171 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#aa712961c9c52e7b6416ef8bcc5b8b174">kwlUpdate</a>(<span class="keywordtype">float</span> timeStepSec);
-<a name="l01172"></a>01172 
-<a name="l01179"></a>01179 <a class="code" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a> <a class="code" href="kowalski_8h.html#a52be1b22d02aafe0bbccc9e415d9279e">kwlGetError</a>();
-<a name="l01180"></a>01180     
-<a name="l01183"></a>01183 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l01184"></a>01184 <span class="preprocessor"></span>}
-<a name="l01185"></a>01185 <span class="preprocessor">#endif </span><span class="comment">/* __cplusplus */</span>
-<a name="l01186"></a>01186     
-<a name="l01187"></a>01187 <span class="preprocessor">#endif </span><span class="comment">/*KWL__KOWALSKI_H*/</span>
+<a name="l01154"></a>01154 <span class="keywordtype">float</span> <a class="code" href="kowalski_8h.html#af88998e67ad4286fb01c54d9a9e175f4">kwlGetLevelRight</a>();
+<a name="l01155"></a>01155 
+<a name="l01172"></a>01172 <span class="keywordtype">int</span> <a class="code" href="kowalski_8h.html#a1322fabd8c575b92cf90e391e0c2013a">kwlHasClipped</a>();
+<a name="l01173"></a>01173     
+<a name="l01187"></a>01187 <span class="keywordtype">void</span> <a class="code" href="kowalski_8h.html#aa712961c9c52e7b6416ef8bcc5b8b174">kwlUpdate</a>(<span class="keywordtype">float</span> timeStepSec);
+<a name="l01188"></a>01188 
+<a name="l01195"></a>01195 <a class="code" href="kowalski_8h.html#a5ebb48f4405b30b38f5553f2070ef5fb">kwlError</a> <a class="code" href="kowalski_8h.html#a52be1b22d02aafe0bbccc9e415d9279e">kwlGetError</a>();
+<a name="l01196"></a>01196     
+<a name="l01199"></a>01199 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l01200"></a>01200 <span class="preprocessor"></span>}
+<a name="l01201"></a>01201 <span class="preprocessor">#endif </span><span class="comment">/* __cplusplus */</span>
+<a name="l01202"></a>01202     
+<a name="l01203"></a>01203 <span class="preprocessor">#endif </span><span class="comment">/*KWL__KOWALSKI_H*/</span>
 </pre></div></div>
 <!--- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -270,7 +272,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-22643421-1']);
+  _gaq.push(['_setAccount', 'UA-26424920-2']);
   _gaq.push(['_trackPageview']);
 
   (function() {
