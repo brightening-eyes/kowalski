@@ -608,8 +608,19 @@ kwlWaveBankHandle kwlWaveBankLoad(const char* const path)
         return KWL_INVALID_HANDLE;
     }
     kwlWaveBankHandle handle = 0;
-    kwlSetError(kwlSoundEngine_loadWaveBank(engine, path, &handle));
+    kwlSetError(kwlSoundEngine_loadWaveBank(engine, path, &handle, 0, NULL));
     return handle;
+}
+
+void kwlWaveBankLoadWithCallback(const char* path, kwlWaveBankFinishedLoadingCallback callback)
+{
+    if (engine == NULL)
+    {
+        kwlSetError(KWL_ENGINE_IS_NOT_INITIALIZED);
+        return KWL_INVALID_HANDLE;
+    }
+    
+    kwlSetError(kwlSoundEngine_loadWaveBank(engine, path, NULL, 1, callback));
 }
 
 int kwlWaveBankIsLoaded(kwlWaveBankHandle handle)
@@ -746,7 +757,7 @@ int kwlEngineDataIsLoaded()
     }
     
     int ret = 0;
-    kwlSetError(kwlSoundEngine_engineDataIsLoaded(engine, &ret));
+    kwlSetError(kwlSoundEngine_isLoaded(engine, &ret));
     return ret;
 }
 

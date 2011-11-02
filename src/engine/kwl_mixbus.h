@@ -25,7 +25,6 @@ freely, subject to the following restrictions:
 
 /*! \file */ 
 
-#include "kwl_event.h"
 #include "kwl_synchronization.h"
 #include "kowalski_ext.h"
 
@@ -33,6 +32,8 @@ freely, subject to the following restrictions:
 extern "C"
 {
 #endif /* __cplusplus */
+  
+struct kwlEvent;
     
 /** 
  * A node in a mix bus tree.

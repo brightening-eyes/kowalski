@@ -71,12 +71,12 @@ kwlEvent* kwlSoundEngine_getEventFromHandle(kwlSoundEngine* engine, kwlEventHand
         int eventInstanceIndex = (handle & 0x7fff) >> 16;
         
         if (eventDefinitionIndex >= 0 && 
-            eventDefinitionIndex < engine->numEventDefinitions)
+            eventDefinitionIndex < engine->engineData.numEventDefinitions)
         {
             if (eventInstanceIndex >= 0 && 
-                eventInstanceIndex < engine->eventDefinitions[eventDefinitionIndex].instanceCount)
+                eventInstanceIndex < engine->engineData.eventDefinitions[eventDefinitionIndex].instanceCount)
             {
-                event = &engine->events[eventDefinitionIndex][eventInstanceIndex];
+                event = &engine->engineData.events[eventDefinitionIndex][eventInstanceIndex];
             }
         }
     }    
@@ -122,6 +122,25 @@ kwlEventHandle computeEventHandle(int eventDefinitionOrFreeformIndex, int eventI
     return handle;
 }
 
+kwlWaveBankHandle kwlSoundEngine_getHandleFromWaveBank(kwlSoundEngine* engine, kwlWaveBank* waveBank)
+{
+    if (waveBank == NULL)
+    {
+        return KWL_INVALID_HANDLE;
+    }
+    
+    for (int i = 0; i < engine->engineData.numWaveBanks; i++)
+    {
+        /*Pointer equality is sufficient*/
+        if (&engine->engineData.waveBanks[i] == waveBank)
+        {
+            return i;
+        }
+    }
+    
+    return KWL_INVALID_HANDLE;
+}
+
 /** */
 void kwlSoundEngine_init(kwlSoundEngine* engine)
 {
@@ -138,11 +157,11 @@ void kwlSoundEngine_init(kwlSoundEngine* engine)
     kwlPositionalAudioListener_init(&engine->listener);
     kwlPositionalAudioSettings_init(&engine->positionalAudioSettings);
     
-    engine->engineDataIsLoaded = 0;
+    engine->engineData.isLoaded = 0;
     engine->playingEventList = NULL;
-    engine->numMixBuses = 0;
-    engine->mixBuses = NULL;    
-    engine->masterBus = NULL;
+    engine->engineData.numMixBuses = 0;
+    engine->engineData.mixBuses = NULL;    
+    engine->engineData.masterBus = NULL;
     
     engine->freeformEventArraySize = 0;
     engine->freeformEvents = NULL;
@@ -163,215 +182,81 @@ void kwlSoundEngine_free(kwlSoundEngine* engine)
     KWL_FREE(engine->decoders);
 }
 
-kwlError kwlSoundEngine_loadWaveBank(kwlSoundEngine* engine, const char* const waveBankPath, kwlWaveBankHandle* handle)
+kwlError kwlSoundEngine_loadWaveBank(kwlSoundEngine* engine, 
+                                     const char* const waveBankPath, 
+                                     kwlWaveBankHandle* handle,
+                                     int threaded,
+                                     kwlWaveBankFinishedLoadingCallback callback)
 {
     /*TODO: handle the case of more than one wave bank sharing a piece of audio data.*/
-    *handle = KWL_INVALID_HANDLE;
-    
-    if (!engine->engineDataIsLoaded)
+    if (!engine->engineData.isLoaded)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
-    
-    /*Open the file...*/
-    kwlInputStream stream;
-    kwlError result = kwlInputStream_initWithFile(&stream, waveBankPath);
-    if (result != KWL_NO_ERROR)
-    {
-        kwlInputStream_close(&stream);
-        return result;
-    }
-    /*... and check the wave bank file identifier.*/
-    int i;
-    for (i = 0; i < KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH; i++)
-    {
-        const char identifierChari = kwlInputStream_readChar(&stream);
-        if (identifierChari != KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER[i])
-        {
-            /* Not the file identifier we expected. */
-            kwlInputStream_close(&stream);
-            return KWL_UNKNOWN_FILE_FORMAT;
-        }
-    }
-    
-    /*Read the ID from the wave bank binary file and find a matching wave bank struct.*/
-    const char* waveBankToLoadId = kwlInputStream_readASCIIString(&stream);
-    const int waveBankToLoadnumAudioDataEntries = kwlInputStream_readIntBE(&stream);
-    const int numWaveBanks = engine->numWaveBanks;
+
+    /* Check that we have a valid wave bank binary file and that its entries match those
+       in engine data.*/
     kwlWaveBank* matchingWaveBank = NULL;
-    int matchingWaveBankIndex = -1;
-    for (i = 0; i < numWaveBanks; i++)
-    {
-        if (strcmp(waveBankToLoadId, engine->waveBanks[i].id) == 0)
-        {
-            matchingWaveBank = &engine->waveBanks[i];
-            matchingWaveBankIndex = i;
-        }
-    }
+    kwlError verifyResult = kwlWaveBank_verifyWaveBankBinary(engine, waveBankPath, &matchingWaveBank);
     
-    KWL_FREE((void*)waveBankToLoadId);
-    if (matchingWaveBank == NULL)
+    if (verifyResult != KWL_NO_ERROR)
     {
-        /*No matching bank was found. Close the file stream and return an error.*/
-        kwlInputStream_close(&stream);
-        return KWL_NO_MATCHING_WAVE_BANK;
+        return verifyResult;
     }
-    else if (waveBankToLoadnumAudioDataEntries != matchingWaveBank->numAudioDataEntries)
-    {
-        /*A matching wave bank was found but the number of audio data entries
-          does not match the binary wave bank data.*/
-        kwlInputStream_close(&stream);
-        return KWL_WAVE_BANK_ENTRY_MISMATCH;
-    }
-    else if (matchingWaveBank->isLoaded != 0)
-    {
-        /*The wave bank is already loaded, just set the handle and do nothing.*/
-        *handle = matchingWaveBankIndex;
-        kwlInputStream_close(&stream);
-        return KWL_NO_ERROR;
-    }
-    
-    /*Store the path the wave bank was loaded from (used when streaming from disk).*/
-    int pathLen = strlen(waveBankPath);
-    matchingWaveBank->waveBankFilePath = (char*)KWL_MALLOC((pathLen + 1) * sizeof(char), "wave bank path string");
-    strcpy(matchingWaveBank->waveBankFilePath, waveBankPath);
-    
-    /*Make sure that the entries of the wave bank to load and the wave bank struct line up.*/
-    for (i = 0; i < waveBankToLoadnumAudioDataEntries; i++)
-    {
-        const char* filePathi = kwlInputStream_readASCIIString(&stream);
-        
-        int matchingEntryIndex = -1;
-        int j = 0;
-        for (j = 0; j < waveBankToLoadnumAudioDataEntries; j++)
-        {
-            if (strcmp(matchingWaveBank->audioDataItems[j].filePath, filePathi) == 0)
-            {
-                matchingEntryIndex = j;
-                break;
-            }
-        }
-        
-        KWL_FREE((void*)filePathi);
-        
-        if (matchingEntryIndex < 0)
-        {
-            /* This wave bank entry has no corresponding waveform slot. Abort loading.*/
-            kwlInputStream_close(&stream);
-            return KWL_WAVE_BANK_ENTRY_MISMATCH;
-        }
-        
-        /*skip to the next wave data entry*/
-        /*const int encoding = */kwlInputStream_readIntBE(&stream);
-        /*const int streamFromDisk = */kwlInputStream_readIntBE(&stream);
-        const int numChannels = kwlInputStream_readIntBE(&stream);
-        KWL_ASSERT((numChannels == 0 || numChannels == 1 || numChannels == 2) && "invalid num channels");
-        const int numBytes = kwlInputStream_readIntBE(&stream);
-        KWL_ASSERT(numBytes > 0);
-        kwlInputStream_skip(&stream, numBytes);
-    }
-    
-    /*Move the stream read position to the first audio data entry.*/
-    kwlInputStream_reset(&stream);
-    kwlInputStream_skip(&stream, KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH);
-    int strLen = kwlInputStream_readIntBE(&stream);
-    kwlInputStream_skip(&stream, strLen); 
-    /*int numEntries = */kwlInputStream_readIntBE(&stream);
-    
+
     /*If we made it this far, the wave bank binary data lines up with a wave
-      bank structure of the engine so we're ready to load audio data.*/
-    for (i = 0; i < waveBankToLoadnumAudioDataEntries; i++)
+     bank structure of the engine so we're ready to load the audio data.*/
+    kwlError result = kwlWaveBank_loadAudioData(matchingWaveBank, waveBankPath, threaded, callback);
+        
+    /*Only care about the handle if this is a blocking call. For non-blocking calls,
+      it gets passed to the loading finished callback.*/
+    if (threaded == 0)
     {
-        char* const waveEntryIdi = kwlInputStream_readASCIIString(&stream);
+        KWL_ASSERT(handle != NULL);
+        KWL_ASSERT(matchingWaveBank != NULL);
         
-        kwlAudioData* matchingAudioData = NULL;
-        int j;
-        for (j = 0; j < waveBankToLoadnumAudioDataEntries; j++)
+        if (result == KWL_NO_ERROR)
         {
-            kwlAudioData* entryj = &matchingWaveBank->audioDataItems[j];
-            if (strcmp(entryj->filePath, waveEntryIdi) == 0)
-            {
-                matchingAudioData = entryj;
-                break;
-            }
-        }
-        
-        KWL_FREE(waveEntryIdi);
-        
-        const kwlAudioEncoding encoding = (kwlAudioEncoding)kwlInputStream_readIntBE(&stream);
-        const int streamFromDisk = kwlInputStream_readIntBE(&stream);
-        const int numChannels = kwlInputStream_readIntBE(&stream);
-        const int numBytes = kwlInputStream_readIntBE(&stream);
-        const int numFrames = numBytes / 2 * numChannels;
-        KWL_ASSERT(numBytes > 0 && "the number of audio data bytes must be positive");
-        KWL_ASSERT(matchingAudioData != NULL && "no matching wave bank entry");
-        KWL_ASSERT(numChannels == 0 || numChannels == 1 || numChannels == 2 && "invalid number of channels");
-
-        /*free any old data*/
-        kwlAudioData_free(matchingAudioData);
-        
-        /*Store audio meta data.*/
-        matchingAudioData->numFrames = numFrames;
-        matchingAudioData->numChannels = numChannels;
-        matchingAudioData->numBytes = numBytes;
-        matchingAudioData->encoding = (kwlAudioEncoding)encoding;
-        matchingAudioData->streamFromDisk = streamFromDisk;
-        matchingAudioData->isLoaded = 1;
-        matchingAudioData->bytes = NULL;
-        
-        if (streamFromDisk == 0)
-        {
-            /*This entry should not be streamed, so allocate audio data up front.*/
-            matchingAudioData->bytes = KWL_MALLOC(numBytes, "kwlSoundEngine_loadWaveBank");
-
-            int bytesRead = kwlInputStream_read(&stream, 
-                                                (signed char*)matchingAudioData->bytes, 
-                                                numBytes);
-            KWL_ASSERT(bytesRead == numBytes);
+            *handle = kwlSoundEngine_getHandleFromWaveBank(engine, matchingWaveBank);
         }
         else
         {
-            /*Store the offset into the wave bank binary files for streaming entries.*/
-            matchingAudioData->fileOffset = kwlInputStream_tell(&stream);
-            kwlInputStream_skip(&stream, numBytes);
+            *handle = KWL_INVALID_HANDLE;
         }
     }
     
-    kwlInputStream_close(&stream);
-    *handle = matchingWaveBankIndex;
-    matchingWaveBank->isLoaded = 1;
-    return KWL_NO_ERROR;
+    return result;
 }
 
 kwlError kwlSoundEngine_waveBankIsLoaded(kwlSoundEngine* engine, kwlWaveBankHandle handle, int* isLoaded)
 {
-    if (engine->engineDataIsLoaded == 0)
+    if (engine->engineData.isLoaded == 0)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
     
-    if (handle < 0 || handle >= engine->numWaveBanks || handle == KWL_INVALID_HANDLE)
+    if (handle < 0 || handle >= engine->engineData.numWaveBanks || handle == KWL_INVALID_HANDLE)
     {
         return KWL_INVALID_WAVE_BANK_HANDLE;
     }
     
-    *isLoaded = engine->waveBanks[handle].isLoaded;
+    *isLoaded = engine->engineData.waveBanks[handle].isLoaded;
     return KWL_NO_ERROR;
 }
 
 kwlError kwlSoundEngine_waveBankIsReferencedByPlayingEvent(kwlSoundEngine* engine, kwlWaveBankHandle handle, int* isReferenced)
 {
-    if (engine->engineDataIsLoaded == 0)
+    if (engine->engineData.isLoaded == 0)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
     
-    if (handle < 0 || handle >= engine->numWaveBanks || handle == KWL_INVALID_HANDLE)
+    if (handle < 0 || handle >= engine->engineData.numWaveBanks || handle == KWL_INVALID_HANDLE)
     {
         return KWL_INVALID_WAVE_BANK_HANDLE;
     }
     
-    kwlWaveBank* waveBank = &engine->waveBanks[handle];
+    kwlWaveBank* waveBank = &engine->engineData.waveBanks[handle];
     *isReferenced = 0;
     
     /*early exit if the wave bank is not loaded*/
@@ -413,12 +298,12 @@ kwlError kwlSoundEngine_waveBankIsReferencedByPlayingEvent(kwlSoundEngine* engin
 
 kwlError kwlSoundEngine_requestUnloadWaveBank(kwlSoundEngine* engine, kwlWaveBankHandle handle, int blockUntilUnloaded)
 {   
-    if (engine->engineDataIsLoaded == 0)
+    if (engine->engineData.isLoaded == 0)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
     
-    if (handle < 0 || handle >= engine->numWaveBanks || handle == KWL_INVALID_HANDLE)
+    if (handle < 0 || handle >= engine->engineData.numWaveBanks || handle == KWL_INVALID_HANDLE)
     {
         return KWL_INVALID_WAVE_BANK_HANDLE;
     }
@@ -426,7 +311,7 @@ kwlError kwlSoundEngine_requestUnloadWaveBank(kwlSoundEngine* engine, kwlWaveBan
     /*Send a message to the mixer to stop all playing events referencing audio data from the wave bank.
       Once the events are stopped, the mixer sends a message back to the engine indicating that it
       is safe to unload the wavebank.*/
-    kwlWaveBank* waveBankToUnload = &engine->waveBanks[handle];
+    kwlWaveBank* waveBankToUnload = &engine->engineData.waveBanks[handle];
     
     if (waveBankToUnload->isLoaded == 0)
     {
@@ -453,51 +338,29 @@ kwlError kwlSoundEngine_requestUnloadWaveBank(kwlSoundEngine* engine, kwlWaveBan
     return KWL_NO_ERROR;
 }
 
-kwlError kwlSoundEngine_unloadWaveBank(kwlSoundEngine* engine, kwlWaveBank* waveBank)
-{
-    if (waveBank->isLoaded == 0)
-    {
-        return KWL_NO_ERROR;
-    }
-    
-    /* Free all allocated audio data in the wave bank*/
-    const int numAudioDataEntriesInBank = waveBank->numAudioDataEntries;
-    int i;
-    for (i = 0; i < numAudioDataEntriesInBank; i++)
-    {
-        kwlAudioData* wavei = &waveBank->audioDataItems[i];
-        kwlAudioData_free(wavei);
-    }
-    waveBank->isLoaded = 0;
-    KWL_FREE(waveBank->waveBankFilePath);
-    
-    return KWL_NO_ERROR;
-}
-
-
 kwlError kwlSoundEngine_eventGetHandle(kwlSoundEngine* engine, const char* const eventID, kwlEventHandle* handle)
 {
     *handle = KWL_INVALID_HANDLE;
     
-    if (!engine->engineDataIsLoaded)
+    if (!engine->engineData.isLoaded)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
     
-    KWL_ASSERT(engine->events != NULL);
-    KWL_ASSERT(engine->eventDefinitions != NULL);
+    KWL_ASSERT(engine->engineData.events != NULL);
+    KWL_ASSERT(engine->engineData.eventDefinitions != NULL);
     
-    const int numEventDefinitions = engine->numEventDefinitions;
+    const int numEventDefinitions = engine->engineData.numEventDefinitions;
     int i;
     for (i = 0; i < numEventDefinitions; i++)
     {
-        if (strcmp(eventID, engine->eventDefinitions[i].id) == 0)
+        if (strcmp(eventID, engine->engineData.eventDefinitions[i].id) == 0)
         {
-            const int numInstances = engine->eventDefinitions[i].instanceCount;
+            const int numInstances = engine->engineData.eventDefinitions[i].instanceCount;
             int j;
             for (j = 0; j < numInstances; j++)
             {
-                kwlEvent* const eventj = &engine->events[i][j];
+                kwlEvent* const eventj = &engine->engineData.events[i][j];
                 if (eventj->isAssociatedWithHandle == 0)
                 {
                     *handle = computeEventHandle(i, j, 0);
@@ -519,15 +382,15 @@ kwlError kwlSoundEngine_eventDefinitionGetHandle(kwlSoundEngine* engine,
 {
     *handle = KWL_INVALID_HANDLE;
     
-    if (!engine->engineDataIsLoaded)
+    if (!engine->engineData.isLoaded)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
     
     int i;
-    for (i = 0; i < engine->numEventDefinitions; i++)
+    for (i = 0; i < engine->engineData.numEventDefinitions; i++)
     {
-        if (strcmp(eventDefinitionID, engine->eventDefinitions[i].id) == 0)
+        if (strcmp(eventDefinitionID, engine->engineData.eventDefinitions[i].id) == 0)
         {
             *handle = i;
             return KWL_NO_ERROR;
@@ -792,19 +655,19 @@ kwlError kwlSoundEngine_eventRelease(kwlSoundEngine* engine, kwlEventHandle hand
 kwlError kwlSoundEngine_mixBusGetHandle(kwlSoundEngine* engine, const char* const busId, kwlMixBusHandle* handle)
 {
     *handle = KWL_INVALID_HANDLE;
-    if (!engine->engineDataIsLoaded)
+    if (!engine->engineData.isLoaded)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
     
-    KWL_ASSERT(engine->mixBuses != NULL);
+    KWL_ASSERT(engine->engineData.mixBuses != NULL);
     
-    const int numMixBuses = engine->numMixBuses;
+    const int numMixBuses = engine->engineData.numMixBuses;
     
     int i;
     for (i = 0; i < numMixBuses; i++)
     {
-        if (strcmp(busId, engine->mixBuses[i].id) == 0)
+        if (strcmp(busId, engine->engineData.mixBuses[i].id) == 0)
         {
             /*the mix bus handle is just the index into the mix bus array*/
             *handle = i;
@@ -817,12 +680,12 @@ kwlError kwlSoundEngine_mixBusGetHandle(kwlSoundEngine* engine, const char* cons
 
 kwlMixBus* kwlSoundEngine_getMixBusFromHandle(kwlSoundEngine* engine, kwlMixBusHandle handle)
 {
-    if (handle < 0 || handle >= engine->numMixBuses || handle == KWL_INVALID_HANDLE) 
+    if (handle < 0 || handle >= engine->engineData.numMixBuses || handle == KWL_INVALID_HANDLE) 
     {
         return NULL;
     }
     
-    return &engine->mixBuses[handle];
+    return &engine->engineData.mixBuses[handle];
 }
 
 kwlError kwlSoundEngine_mixBusSetGain(kwlSoundEngine* engine, kwlMixBusHandle handle, float gain, int isLinearGain)
@@ -870,9 +733,9 @@ kwlError kwlSoundEngine_mixBusSetPitch(kwlSoundEngine* engine, kwlMixBusHandle h
 kwlError kwlSoundEngine_mixPresetGetHandle(kwlSoundEngine* engine, const char* const presetId, kwlMixBusHandle* handle)
 {
     int i;
-    for (i = 0; i < engine->numMixPresets; i++)
+    for (i = 0; i < engine->engineData.numMixPresets; i++)
     {
-        if (strcmp(presetId, engine->mixPresets[i].id) == 0)
+        if (strcmp(presetId, engine->engineData.mixPresets[i].id) == 0)
         {
             *handle = i;
             return KWL_NO_ERROR;
@@ -885,21 +748,21 @@ kwlError kwlSoundEngine_mixPresetGetHandle(kwlSoundEngine* engine, const char* c
 
 kwlError kwlSoundEngine_mixPresetSetActive(kwlSoundEngine* engine, kwlMixPresetHandle handle, int doFade)
 {
-    if (handle < 0 || handle >= engine->numMixPresets || handle == KWL_INVALID_HANDLE)
+    if (handle < 0 || handle >= engine->engineData.numMixPresets || handle == KWL_INVALID_HANDLE)
     {
         return KWL_INVALID_MIX_PRESET_HANDLE;
     }
     
     int i;
-    for (i = 0; i < engine->numMixPresets; i++)
+    for (i = 0; i < engine->engineData.numMixPresets; i++)
     {
         float w = (i == handle ? 1.0f : 0.0f);
-        engine->mixPresets[i].targetWeight = w;
+        engine->engineData.mixPresets[i].targetWeight = w;
         
         /*if we're not doing a fade, just set the weight straight away*/
         if (doFade == 0)
         {
-            engine->mixPresets[i].weight = w;
+            engine->engineData.mixPresets[i].weight = w;
         }
     }
     
@@ -1089,14 +952,14 @@ float kwlSoundEngine_getDistanceGain(kwlSoundEngine* engine, float distanceInv)
 void kwlSoundEngine_updateMixPresets(kwlSoundEngine* engine, float timeStepSec)
 {
     /*TODO: read from project data?*/
-    engine->mixPresetFadeTime = 1.0f;
+    engine->engineData.mixPresetFadeTime = 1.0f;
     
     /*update mix preset weights towards the target values*/
-    float dWeight = engine->mixPresetFadeTime > 0.0f ? timeStepSec / engine->mixPresetFadeTime : 1.0f;
+    float dWeight = engine->engineData.mixPresetFadeTime > 0.0f ? timeStepSec / engine->engineData.mixPresetFadeTime : 1.0f;
     int i;
-    for (i = 0; i < engine->numMixPresets; i++)
+    for (i = 0; i < engine->engineData.numMixPresets; i++)
     {
-        kwlMixPreset* preseti = &engine->mixPresets[i];
+        kwlMixPreset* preseti = &engine->engineData.mixPresets[i];
         //printf("updating %s to weight ", preseti->id);
         
         float delta = preseti->weight < preseti->targetWeight ? dWeight : - dWeight;
@@ -1117,9 +980,9 @@ void kwlSoundEngine_updateMixPresets(kwlSoundEngine* engine, float timeStepSec)
     
     if (0)
     {
-        for (i = 0; i < engine->numMixPresets; i++)
+        for (i = 0; i < engine->engineData.numMixPresets; i++)
         {
-            kwlMixPreset* preseti = &engine->mixPresets[i];
+            kwlMixPreset* preseti = &engine->engineData.mixPresets[i];
             
             printf("%s weight %f        ", preseti->id, preseti->weight);
         }
@@ -1129,27 +992,27 @@ void kwlSoundEngine_updateMixPresets(kwlSoundEngine* engine, float timeStepSec)
     /* Blend mix preset parameter sets.  
        First reset all mix bus parameters...*/
     int mixBusIndex;
-    for (mixBusIndex = 0; mixBusIndex < engine->numMixBuses; mixBusIndex++)
+    for (mixBusIndex = 0; mixBusIndex < engine->engineData.numMixBuses; mixBusIndex++)
     {
-        engine->mixBuses[mixBusIndex].mixPresetGainLeft = 0.0f;
-        engine->mixBuses[mixBusIndex].mixPresetGainRight = 0.0f;
-        engine->mixBuses[mixBusIndex].mixPresetPitch = 0.0f;
+        engine->engineData.mixBuses[mixBusIndex].mixPresetGainLeft = 0.0f;
+        engine->engineData.mixBuses[mixBusIndex].mixPresetGainRight = 0.0f;
+        engine->engineData.mixBuses[mixBusIndex].mixPresetPitch = 0.0f;
     }
     
     /*...then accumulate the values from each mix preset.*/
     float debugWeightSum[7] = {0, 0, 0, 0, 0, 0, 0};
     int j;
-    for (j = 0; j < engine->numMixPresets; j++)
+    for (j = 0; j < engine->engineData.numMixPresets; j++)
     {
-        float presetweight = engine->mixPresets[j].weight;
-        for (int paramSetIndex = 0; paramSetIndex < engine->numMixBuses; paramSetIndex++)
+        float presetweight = engine->engineData.mixPresets[j].weight;
+        for (int paramSetIndex = 0; paramSetIndex < engine->engineData.numMixBuses; paramSetIndex++)
         {
-            kwlMixBusParameters* params = &engine->mixPresets[j].parameterSets[paramSetIndex];
+            kwlMixBusParameters* params = &engine->engineData.mixPresets[j].parameterSets[paramSetIndex];
             int busIndex = params->mixBusIndex;
-            KWL_ASSERT(busIndex < engine->numMixBuses && busIndex >= 0);
-            engine->mixBuses[busIndex].mixPresetGainLeft += params->logGainLeft * presetweight;
-            engine->mixBuses[busIndex].mixPresetGainRight += params->logGainRight * presetweight;
-            engine->mixBuses[busIndex].mixPresetPitch += params->pitch * presetweight;
+            KWL_ASSERT(busIndex < engine->engineData.numMixBuses && busIndex >= 0);
+            engine->engineData.mixBuses[busIndex].mixPresetGainLeft += params->logGainLeft * presetweight;
+            engine->engineData.mixBuses[busIndex].mixPresetGainRight += params->logGainRight * presetweight;
+            engine->engineData.mixBuses[busIndex].mixPresetPitch += params->pitch * presetweight;
             debugWeightSum[busIndex] += presetweight;
         }
     }
@@ -1163,12 +1026,12 @@ void kwlSoundEngine_updateMixPresets(kwlSoundEngine* engine, float timeStepSec)
     printf("\n");*/
     
     /*Finally, convert from adjusted gain to linear gain.*/
-    for (mixBusIndex = 0; mixBusIndex < engine->numMixBuses; mixBusIndex++)
+    for (mixBusIndex = 0; mixBusIndex < engine->engineData.numMixBuses; mixBusIndex++)
     {
-        engine->mixBuses[mixBusIndex].mixPresetGainLeft = 
-            logGainToLinGain(engine->mixBuses[mixBusIndex].mixPresetGainLeft);
-        engine->mixBuses[mixBusIndex].mixPresetGainRight = 
-            logGainToLinGain(engine->mixBuses[mixBusIndex].mixPresetGainRight);
+        engine->engineData.mixBuses[mixBusIndex].mixPresetGainLeft = 
+            logGainToLinGain(engine->engineData.mixBuses[mixBusIndex].mixPresetGainLeft);
+        engine->engineData.mixBuses[mixBusIndex].mixPresetGainRight = 
+            logGainToLinGain(engine->engineData.mixBuses[mixBusIndex].mixPresetGainRight);
         
         /*printf("setting gain of bus %s to %f\n", 
                engine->mixBuses[mixBusIndex].id,
@@ -1384,11 +1247,11 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
         eventList = eventList->nextEvent_engine;
     }
     
-    const int numMixBuses = engine->numMixBuses;
+    const int numMixBuses = engine->engineData.numMixBuses;
     int i;
     for (i = 0; i < numMixBuses; i++)
     {
-        kwlMixBus* busi = &engine->mixBuses[i];
+        kwlMixBus* busi = &engine->engineData.mixBuses[i];
         busi->totalGainLeft.valueShared = busi->mixPresetGainLeft * busi->userGainLeft;
         busi->totalGainRight.valueShared = busi->mixPresetGainRight * busi->userGainRight;
         busi->totalPitch.valueShared = busi->mixPresetPitch * busi->userPitch;
@@ -1457,7 +1320,7 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
         {
             kwlWaveBank* waveBank = (kwlWaveBank*)messageData;
             //printf("    unload wave bank: %s\n", waveBank->id);
-            kwlSoundEngine_unloadWaveBank(engine, waveBank);
+            kwlWaveBank_unload(waveBank);
         }
         else if (type == KWL_UNLOAD_ENGINE_DATA)
         {
@@ -1469,7 +1332,7 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
     
     if (unloadEngineDataRequested != 0)
     {
-        kwlSoundEngine_engineDataUnload(engine);
+        kwlEngineData_unload(&engine->engineData);
     }
     
     engine->fromMixerQueue.numMessages = 0;
@@ -1593,12 +1456,12 @@ kwlError kwlSoundEngine_eventStartOneShot(kwlSoundEngine* engine,
     /* Check handle*/
     if (handle == KWL_INVALID_HANDLE ||
         handle < 0 ||
-        handle >= engine->numEventDefinitions)
+        handle >= engine->engineData.numEventDefinitions)
     {
         return KWL_INVALID_EVENT_DEFINITION_HANDLE;
     }
     
-    kwlEventDefinition* definition = &engine->eventDefinitions[handle];
+    kwlEventDefinition* definition = &engine->engineData.eventDefinitions[handle];
     
     if (startAtPosition != 0 && definition->isPositional == 0)
     {
@@ -1619,12 +1482,12 @@ kwlError kwlSoundEngine_eventStartOneShot(kwlSoundEngine* engine,
     int i;
     for (i = 0; i < instanceCount; i++)
     {
-        if (engine->events[handle][i].isAssociatedWithHandle == 0)
+        if (engine->engineData.events[handle][i].isAssociatedWithHandle == 0)
         {
             numStealableInstances++;
-            if (engine->events[handle][i].isPlaying == 0)
+            if (engine->engineData.events[handle][i].isPlaying == 0)
             {
-                instanceToStart = &engine->events[handle][i];
+                instanceToStart = &engine->engineData.events[handle][i];
             }
         }
     }
@@ -1657,12 +1520,12 @@ kwlError kwlSoundEngine_eventStartOneShot(kwlSoundEngine* engine,
 
             for (i = 0; i < instanceCount; i++)
             {
-                if (engine->events[handle][i].isAssociatedWithHandle == 0 &&
-                    engine->events[handle][i].isPlaying == 1)
+                if (engine->engineData.events[handle][i].isAssociatedWithHandle == 0 &&
+                    engine->engineData.events[handle][i].isPlaying == 1)
                 {
                     if (stealableIndex == stealIndex)
                     {
-                        instanceToStart = &engine->events[handle][i];
+                        instanceToStart = &engine->engineData.events[handle][i];
                         break;
                     }
                     stealableIndex++;
@@ -1676,15 +1539,15 @@ kwlError kwlSoundEngine_eventStartOneShot(kwlSoundEngine* engine,
 
             for (i = 0; i < instanceCount; i++)
             {
-                if (engine->events[handle][i].isAssociatedWithHandle == 0 &&
-                    engine->events[handle][i].isPlaying == 1)
+                if (engine->engineData.events[handle][i].isAssociatedWithHandle == 0 &&
+                    engine->engineData.events[handle][i].isPlaying == 1)
                 {
                     /*Compare against the average channel gain of the instance.*/
-                    float gain = engine->events[handle][i].gainLeft.valueEngine +
-                                 engine->events[handle][i].gainRight.valueEngine;
+                    float gain = engine->engineData.events[handle][i].gainLeft.valueEngine +
+                                 engine->engineData.events[handle][i].gainRight.valueEngine;
                     if (minGain < 0 || gain < minGain)
                     {
-                        instanceToStart = &engine->events[handle][i];
+                        instanceToStart = &engine->engineData.events[handle][i];
                     }
                 }
             }
@@ -2093,486 +1956,11 @@ void kwlSoundEngine_removeEventFromPlayingList(kwlSoundEngine* engine, kwlEvent*
  * Data loading/unloading methods 
  *****************************************************************************/
 
-kwlError kwlSoundEngine_loadNonAudioData(kwlSoundEngine* engine, kwlInputStream* stream)
+kwlError kwlSoundEngine_loadEngineData(kwlSoundEngine* engine, kwlInputStream* stream)
 {
-    if (engine->engineDataIsLoaded)
-    {
-        KWL_ASSERT(0 && "TODO: free current data");
-    }
-    
-    /*check file identifier*/
-    int i;
-    for (i = 0; i < KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER_LENGTH; i++)
-    {
-        const char identifierChari = kwlInputStream_readChar(stream);
-        if (identifierChari != KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER[i])
-        {
-            return KWL_UNKNOWN_FILE_FORMAT;
-        }
-    }
-    
-    /*Load chunks*/
-    kwlSoundEngine_loadMixBusData(engine, stream);
-    kwlSoundEngine_loadMixPresetData(engine, stream);
-    kwlSoundEngine_loadWaveBankData(engine, stream);
-    /*must happen after wave bank loading*/
-    kwlSoundEngine_loadSoundData(engine, stream);
-    /*must happen after sound, wave bank and mix bus loading.*/
-    kwlSoundEngine_loadEventData(engine, stream);
-    
-    engine->engineDataIsLoaded = 1;
-    return KWL_NO_ERROR;
+    return kwlEngineData_load(&engine->engineData, stream);
+
 }
-
-void kwlSoundEngine_seekToEngineDataChunk(kwlSoundEngine* engine, kwlInputStream* stream, int chunkId)
-{
-    /*move to the start of the stream*/
-    kwlInputStream_reset(stream);
-    /*move to first chunk*/
-    kwlInputStream_skip(stream, KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER_LENGTH);
-    
-    while (!kwlInputStream_isAtEndOfStream(stream))
-    {
-        const int currentChunkId = kwlInputStream_readIntBE(stream);
-        const int chunkSize = kwlInputStream_readIntBE(stream);
-        if (currentChunkId == chunkId)
-        {
-            return;
-        }
-        else
-        {
-            kwlInputStream_skip(stream, chunkSize);
-        }
-    }
-    
-    KWL_ASSERT(0 && "no matching chunk id found");
-}
-
-void kwlSoundEngine_loadMixBusData(kwlSoundEngine* engine, kwlInputStream* stream)
-{
-    kwlSoundEngine_seekToEngineDataChunk(engine, stream, KWL_MIX_BUSES_CHUNK_ID);
-    KWL_ASSERT(engine->mixBuses == NULL);
-
-    /*allocate memory for the mix bus data*/
-    const int numMixBuses = kwlInputStream_readIntBE(stream);
-    KWL_ASSERT(numMixBuses > 0);
-    engine->numMixBuses = numMixBuses;
-    engine->numMixBuses = numMixBuses;
-    engine->mixBuses = 
-        (kwlMixBus*)KWL_MALLOC(numMixBuses * sizeof(kwlMixBus), 
-                               "kwlSoundEngine_loadMixBusData: mixer bus array");
-    engine->mixBuses = engine->mixBuses;
-    engine->numMixBuses = engine->numMixBuses;
-    kwlMemset(engine->mixBuses, 0, numMixBuses * sizeof(kwlMixBus));
-    
-    /*read mix bus data*/
-    int i;
-    for (i = 0; i < numMixBuses; i++)
-    {
-        kwlMixBus* const mixBusi = &engine->mixBuses[i];
-        kwlMixBus_init(mixBusi);
-    
-        mixBusi->id = kwlInputStream_readASCIIString(stream);
-        if (strcmp(mixBusi->id, "master") == 0)
-        {
-            KWL_ASSERT(engine->masterBus == NULL && "multiple master buses found");
-            engine->masterBus = mixBusi;
-            engine->masterBus->isMaster = 1;
-        }
-        
-        const int numSubBuses = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(numSubBuses >= 0);
-        mixBusi->numSubBuses = numSubBuses;
-        mixBusi->subBuses = NULL;
-        if (numSubBuses > 0)
-        {
-            mixBusi->subBuses = (kwlMixBus**)KWL_MALLOC(numSubBuses * sizeof(kwlMixBus*), 
-                                                        "kwlSoundEngine_loadMixBusData: sub buses");
-            int j;
-            for (j = 0; j < numSubBuses; j++)
-            {
-                const int subBusIndexj = kwlInputStream_readIntBE(stream);
-                KWL_ASSERT(subBusIndexj >= 0 && subBusIndexj < numMixBuses);
-                mixBusi->subBuses[j] = &engine->mixBuses[subBusIndexj];
-            }
-        }
-    }
-    
-    KWL_ASSERT(engine->masterBus != NULL);
-}
-
-void kwlSoundEngine_freeMixBusData(kwlSoundEngine* engine)
-{   
-    if (engine->mixBuses == NULL)
-    {
-        return;
-    }
-    
-    /*free the mix bus IDs*/
-    const int numMixBuses = engine->numMixBuses;
-    int i;
-    for (i = 0; i < numMixBuses; i++)
-    {
-        if (engine->mixBuses[i].subBuses != NULL)
-        {
-            KWL_FREE(engine->mixBuses[i].subBuses);
-        }
-        KWL_FREE(engine->mixBuses[i].id);
-    }
-    
-    /*free the mix bus array*/
-    KWL_FREE(engine->mixBuses);
-    engine->mixBuses = NULL;
-    engine->masterBus = NULL;
-    engine->mixBuses = NULL;;
-    engine->numMixBuses = 0;;
-    engine->masterBus = NULL;
-}
-
-void kwlSoundEngine_loadMixPresetData(kwlSoundEngine* engine, kwlInputStream* stream)
-{
-    kwlSoundEngine_seekToEngineDataChunk(engine, stream, KWL_MIX_PRESETS_CHUNK_ID);
-    KWL_ASSERT(engine->mixBuses != 0); /*needed for mix bus lookup per param set*/
-    
-    /*allocate memory for the mix preset data*/
-    const int numMixPresets = kwlInputStream_readIntBE(stream);
-    KWL_ASSERT(numMixPresets > 0);
-    engine->numMixPresets = numMixPresets;
-    const int numParameterSets = engine->numMixBuses;
-    int defaultPresetIndex = -1;
-    engine->mixPresets = (kwlMixPreset*)KWL_MALLOC(sizeof(kwlMixPreset) * numMixPresets,
-                                                   "kwlSoundEngine_loadMixPresetData");
-    
-    /*read data*/
-    int i;
-    for (i = 0; i < numMixPresets; i++)
-    {
-        engine->mixPresets[i].id = kwlInputStream_readASCIIString(stream);
-        const int isDefault = kwlInputStream_readIntBE(stream);
-        if (isDefault != 0)
-        {
-            KWL_ASSERT(defaultPresetIndex == -1 && "multiple default presets found");
-            defaultPresetIndex = i;
-            engine->mixPresets[i].weight = 1.0f;
-            engine->mixPresets[i].targetWeight = 1.0f;
-        }
-        else
-        {
-            engine->mixPresets[i].weight = 0.0f;
-            engine->mixPresets[i].targetWeight = 0.0f;
-        }
-        
-        engine->mixPresets[i].numParameterSets = numParameterSets;
-        engine->mixPresets[i].parameterSets = 
-            (kwlMixBusParameters*)KWL_MALLOC(sizeof(kwlMixBusParameters) * numParameterSets, 
-                                             "kwlSoundEngine_loadMixPresetData");
-        int j;
-        for (j = 0; j < numParameterSets; j++)
-        {
-            const int mixBusIndex = kwlInputStream_readIntBE(stream);
-            KWL_ASSERT(mixBusIndex >= 0 &&  mixBusIndex < numParameterSets);
-            engine->mixPresets[i].parameterSets[j].mixBusIndex = mixBusIndex;
-            engine->mixPresets[i].parameterSets[j].logGainLeft = kwlInputStream_readFloatBE(stream);
-            engine->mixPresets[i].parameterSets[j].logGainRight = kwlInputStream_readFloatBE(stream);
-            engine->mixPresets[i].parameterSets[j].pitch = kwlInputStream_readFloatBE(stream);
-        }
-    }
-    KWL_ASSERT(defaultPresetIndex >= 0);
-    
-}
-
-void kwlSoundEngine_freeMixPresetData(kwlSoundEngine* engine)
-{
-    if (engine->mixPresets == NULL)
-    {
-        return;
-    }
-
-    const int numMixPresets = engine->numMixPresets;
-    
-    /*free any memory allocated per mix preset*/
-    int i;
-    for (i = 0; i < numMixPresets; i++)
-    {
-        KWL_FREE(engine->mixPresets[i].id);
-        KWL_FREE(engine->mixPresets[i].parameterSets);
-    }
-    
-    /*free the mix preset array*/
-    KWL_FREE(engine->mixPresets);
-    engine->mixPresets = NULL;
-    engine->numMixPresets = 0;
-}
-
-/** */
-void kwlSoundEngine_loadEventData(kwlSoundEngine* engine, kwlInputStream* stream)
-{
-    kwlSoundEngine_seekToEngineDataChunk(engine, stream, KWL_EVENTS_CHUNK_ID);
-    KWL_ASSERT(engine->sounds != NULL);
-    KWL_ASSERT(engine->events == NULL);
-    KWL_ASSERT(engine->eventDefinitions == NULL);
-    
-    /*read the total number of event definitions*/
-    const int numEventDefinitions = kwlInputStream_readIntBE(stream);
-    KWL_ASSERT(numEventDefinitions > 0);
-    engine->numEventDefinitions = numEventDefinitions;
-    engine->events = 
-        (kwlEvent**)KWL_MALLOC(numEventDefinitions * sizeof(kwlEvent*), "kwlSoundEngine_loadEventData");
-    kwlMemset(engine->events, 0, numEventDefinitions * sizeof(kwlEvent*));
-    engine->eventDefinitions = 
-        (kwlEventDefinition*)KWL_MALLOC(numEventDefinitions * sizeof(kwlEventDefinition), "kwlSoundEngine_loadEventData");
-    kwlMemset(engine->eventDefinitions, 0, numEventDefinitions * sizeof(kwlEventDefinition));
-    
-    int i;
-    for (i = 0; i < numEventDefinitions; i++)
-    {
-        kwlEventDefinition* definitioni = &engine->eventDefinitions[i];
-        /*read the id of this event definition*/
-        definitioni->id = kwlInputStream_readASCIIString(stream);
-        
-        const int instanceCount = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(instanceCount >= -1);
-        definitioni->instanceCount = instanceCount;
-        const int numInstancesToAllocate = instanceCount < 1 ? 1 : instanceCount;
-        engine->events[i] = 
-            (kwlEvent*)KWL_MALLOC(numInstancesToAllocate * sizeof(kwlEvent), "kwlSoundEngine_loadEventData");
-        kwlMemset(engine->events[i], 0, numInstancesToAllocate * sizeof(kwlEvent));
-        
-        definitioni->gain = kwlInputStream_readFloatBE(stream);
-        definitioni->pitch = kwlInputStream_readFloatBE(stream);
-        const float degToRad = 0.0174532925199433;
-        float innerConeAngleRad = degToRad * kwlInputStream_readFloatBE(stream);
-        float outerConeAngleRad = degToRad * kwlInputStream_readFloatBE(stream);
-        definitioni->innerConeCosAngle = cosf(innerConeAngleRad / 2.0f);
-        definitioni->outerConeCosAngle = cosf(outerConeAngleRad / 2.0f);
-        definitioni->outerConeGain = kwlInputStream_readFloatBE(stream);
-        
-        kwlEvent_init(&engine->events[i][0]);
-        engine->events[i][0].definition_engine = definitioni;
-        engine->events[i][0].definition_mixer = definitioni;
-        
-        /*read the index of the mix bus that this event belongs to*/
-        const int mixBusIndex = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(mixBusIndex >= 0 && mixBusIndex < engine->numMixBuses);
-        definitioni->mixBus = &engine->mixBuses[mixBusIndex];
-        definitioni->isPositional = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(definitioni->isPositional == 0 || 
-               definitioni->isPositional == 1);
-        
-        /*read the index of the sound referenced by this event (ignored for streaming events)*/
-        const int soundIndex = kwlInputStream_readIntBE(stream);
-        if (soundIndex == -1)
-        {
-            /*streaming event, no sound.*/
-            definitioni->sound = NULL;
-        }
-        else
-        {
-            KWL_ASSERT(soundIndex >= 0 && soundIndex < engine->numSoundDefinitions);
-            definitioni->sound = &engine->sounds[soundIndex];
-        }
-        
-        /*read the event retrigger mode (ignored for streaming events)*/
-        definitioni->retriggerMode = (kwlEventRetriggerMode)kwlInputStream_readIntBE(stream); /*TODO: assert*/
-        KWL_ASSERT(definitioni->retriggerMode < 10 && definitioni->retriggerMode >= 0);
-        
-        /*read the index of the audio data referenced by this event (only used for streaming events)*/
-        const int waveBankIndex = kwlInputStream_readIntBE(stream);
-        const int audioDataIndex = kwlInputStream_readIntBE(stream);
-        if (audioDataIndex >= 0 && audioDataIndex < engine->totalNumAudioDataEntries &&
-            waveBankIndex >=0 && waveBankIndex < engine->numWaveBanks)
-        {
-            definitioni->streamAudioData = &engine->waveBanks[waveBankIndex].audioDataItems[audioDataIndex];
-        }
-        else
-        {
-            definitioni->streamAudioData = NULL;
-        }
-        
-        /*read loop flag (ignored for non-streaming events)*/
-        const int loopIfStreaming = kwlInputStream_readIntBE(stream);
-        definitioni->loopIfStreaming = loopIfStreaming;
-        
-        /*read referenced wave banks*/
-        definitioni->numReferencedWaveBanks = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(definitioni->numReferencedWaveBanks < 10000 && definitioni->numReferencedWaveBanks >= 0);
-        definitioni->referencedWaveBanks = 
-            (kwlWaveBank**)KWL_MALLOC(definitioni->numReferencedWaveBanks * sizeof(kwlWaveBank*), "wave bank refs");
-        int j;
-        for (j = 0; j < definitioni->numReferencedWaveBanks; j++)
-        {
-            int waveBankIndex = kwlInputStream_readIntBE(stream);
-            KWL_ASSERT(waveBankIndex >= 0 && waveBankIndex < engine->numWaveBanks);
-            definitioni->referencedWaveBanks[j] = &engine->waveBanks[waveBankIndex];
-        }
-        
-        /*copy the first event instance to the other slots.*/
-        for (j = 1; j < numInstancesToAllocate; j++)
-        {
-            kwlMemcpy(&engine->events[i][j], &engine->events[i][0], sizeof(kwlEvent));
-        }
-    }
-}
-
-void kwlSoundEngine_freeEventData(kwlSoundEngine* engine)
-{
-    if (engine->events == NULL && 
-        engine->eventDefinitions == NULL)
-    {
-        return;
-    }
-    
-    const int numEventDefinitions = engine->numEventDefinitions;
-    
-    int i;
-    for (i = 0; i < numEventDefinitions; i++)
-    {
-        kwlEventDefinition* defi = &engine->eventDefinitions[i];
-        KWL_FREE(engine->events[i]);
-        KWL_FREE(defi->referencedWaveBanks);
-        KWL_FREE(defi->id);
-    }
-    
-    KWL_FREE(engine->events);
-    engine->events = NULL;
-    KWL_FREE(engine->eventDefinitions);
-    engine->eventDefinitions = NULL;
-    engine->numEventDefinitions = 0;
-}
-
-/** */
-void kwlSoundEngine_loadSoundData(kwlSoundEngine* engine, kwlInputStream* stream)
-{
-    kwlSoundEngine_seekToEngineDataChunk(engine, stream, KWL_SOUNDS_CHUNK_ID);
-    
-    /*allocate memory for sound definitions*/
-    const int numSoundDefinitions = kwlInputStream_readIntBE(stream);
-    KWL_ASSERT(numSoundDefinitions >= 0 && "the number of sound definitions must be non-negative");
-    engine->numSoundDefinitions = numSoundDefinitions;
-    engine->sounds = (kwlSound*)KWL_MALLOC(numSoundDefinitions * sizeof(kwlSound), "sound definitions");
-    kwlMemset(engine->sounds, 0, numSoundDefinitions * sizeof(kwlSound));
-    
-    /*read sound definitions*/
-    int i;
-    for (i = 0; i < numSoundDefinitions; i++)
-    {
-        kwlSound_init(&engine->sounds[i]);
-        engine->sounds[i].playbackCount = kwlInputStream_readIntBE(stream);
-        engine->sounds[i].deferStop = kwlInputStream_readIntBE(stream);
-        engine->sounds[i].gain = kwlInputStream_readFloatBE(stream);
-        engine->sounds[i].gainVariation = kwlInputStream_readFloatBE(stream);
-        engine->sounds[i].pitch = kwlInputStream_readFloatBE(stream);
-        engine->sounds[i].pitchVariation = kwlInputStream_readFloatBE(stream);
-        engine->sounds[i].playbackMode = (kwlSoundPlaybackMode)kwlInputStream_readIntBE(stream);
-        
-        const int numWaveReferences = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(numWaveReferences > 0);
-        engine->sounds[i].audioDataEntries = (kwlAudioData**)KWL_MALLOC(numWaveReferences * sizeof(kwlAudioData*), 
-                                                             "kwlSoundEngine_loadSoundData: wave list");
-        engine->sounds[i].numAudioDataEntries = numWaveReferences;
-
-        int j;
-        for (j = 0; j < numWaveReferences; j++)
-        {
-            const int waveBankIndex = kwlInputStream_readIntBE(stream);
-            KWL_ASSERT(waveBankIndex >= 0 && waveBankIndex < engine->numWaveBanks);
-            kwlWaveBank* waveBank = &engine->waveBanks[waveBankIndex];
-        
-            const int audioDataIndex = kwlInputStream_readIntBE(stream);
-            KWL_ASSERT(audioDataIndex >= 0 && audioDataIndex < waveBank->numAudioDataEntries);
-            
-            KWL_ASSERT(engine->audioDataEntries != NULL);
-            engine->sounds[i].audioDataEntries[j] = &waveBank->audioDataItems[audioDataIndex];
-        }
-    }
-}
-
-/** */
-void kwlSoundEngine_freeSoundData(kwlSoundEngine* engine)
-{
-    if (engine->sounds == NULL)
-    {
-        return;
-    }
-    
-    int i;
-    for (i = 0; i < engine->numSoundDefinitions; i++)
-    {
-        KWL_FREE(engine->sounds[i].audioDataEntries);
-    }
-    KWL_FREE(engine->sounds);    
-    engine->sounds = NULL;
-    engine->numSoundDefinitions = 0;
-}
-
-/** non-audio data */
-void kwlSoundEngine_loadWaveBankData(kwlSoundEngine* engine, kwlInputStream* stream)
-{
-    kwlSoundEngine_seekToEngineDataChunk(engine, stream, KWL_WAVE_BANKS_CHUNK_ID);
-    
-    /*deserialize wave bank structures*/
-    const int totalnumAudioDataEntries = kwlInputStream_readIntBE(stream);
-    KWL_ASSERT(totalnumAudioDataEntries > 0);
-    const int numWaveBanks = kwlInputStream_readIntBE(stream);
-    KWL_ASSERT(numWaveBanks > 0);
-    
-    engine->totalNumAudioDataEntries = totalnumAudioDataEntries;
-    engine->audioDataEntries = (kwlAudioData*)KWL_MALLOC(totalnumAudioDataEntries * sizeof(kwlAudioData), "kwlSoundEngine_loadWaveBankData");
-    kwlMemset(engine->audioDataEntries, 0, totalnumAudioDataEntries * sizeof(kwlAudioData)); 
-    
-    engine->numWaveBanks = numWaveBanks;
-    engine->waveBanks = (kwlWaveBank*)KWL_MALLOC(numWaveBanks * sizeof(kwlWaveBank), "kwlSoundEngine_loadWaveBankData");
-    kwlMemset(engine->waveBanks, 0, numWaveBanks * sizeof(kwlWaveBank)); 
-
-    int i;
-    int audioDataItemIdx = 0;
-    for (i = 0; i < numWaveBanks; i++)
-    {
-        kwlWaveBank* waveBanki = &engine->waveBanks[i];
-        waveBanki->id = kwlInputStream_readASCIIString(stream);
-        const int numAudioDataEntries = kwlInputStream_readIntBE(stream);
-        KWL_ASSERT(numAudioDataEntries > 0);
-        waveBanki->numAudioDataEntries = numAudioDataEntries;
-        waveBanki->audioDataItems = &engine->audioDataEntries[audioDataItemIdx];
-        int j;
-        for (j = 0; j < numAudioDataEntries; j++)
-        {
-            engine->audioDataEntries[audioDataItemIdx].filePath = kwlInputStream_readASCIIString(stream);
-            engine->audioDataEntries[audioDataItemIdx].waveBank = waveBanki;
-            audioDataItemIdx++;
-        }
-    }
-}
-
-/** */
-void kwlSoundEngine_freeWaveBankData(kwlSoundEngine* engine)
-{
-    if (engine->waveBanks != NULL)
-    {
-        
-        const int numWaveBanks = engine->numWaveBanks;
-        int i;
-        for (i = 0; i < numWaveBanks; i++)
-        {
-            KWL_FREE((void*)engine->waveBanks[i].id);
-        }
-        KWL_FREE(engine->waveBanks);
-        engine->waveBanks = NULL;
-    }
-    
-    if (engine->audioDataEntries != NULL)
-    {
-        const int numAudioDataEntries = engine->totalNumAudioDataEntries;
-        int i;
-        for (i = 0; i < numAudioDataEntries; i++)
-        {
-            KWL_FREE((void*)engine->audioDataEntries[i].filePath);
-        }
-        KWL_FREE(engine->audioDataEntries);
-        engine->audioDataEntries = NULL;
-    }
-}
-
 
 /** */
 kwlError kwlSoundEngine_initialize(kwlSoundEngine* engine, 
@@ -2594,15 +1982,15 @@ kwlError kwlSoundEngine_initialize(kwlSoundEngine* engine,
     return result;
 }
 
-kwlError kwlSoundEngine_engineDataIsLoaded(kwlSoundEngine* engine, int* ret)
+kwlError kwlSoundEngine_isLoaded(kwlSoundEngine* engine, int* ret)
 {
-    *ret = engine->engineDataIsLoaded;
+    *ret = engine->engineData.isLoaded;
     return KWL_NO_ERROR;
 }
 
 kwlError kwlSoundEngine_engineDataLoad(kwlSoundEngine* engine, const char* const dataFile)
 {
-    if (engine->engineDataIsLoaded != 0)
+    if (engine->engineData.isLoaded != 0)
     {
         return KWL_ENGINE_ALREADY_LOADED;
     }
@@ -2616,7 +2004,7 @@ kwlError kwlSoundEngine_engineDataLoad(kwlSoundEngine* engine, const char* const
         return result;
     }
     
-    result = kwlSoundEngine_loadNonAudioData(engine, &stream);
+    result = kwlSoundEngine_loadEngineData(engine, &stream);
     
     kwlInputStream_close(&stream);
     
@@ -2629,15 +2017,15 @@ kwlError kwlSoundEngine_engineDataLoad(kwlSoundEngine* engine, const char* const
       bus hierarchy has been loaded.*/
     int success = kwlMessageQueue_addMessageWithParam(&engine->toMixerQueue, 
                                                       KWL_SET_MASTER_BUS, 
-                                                      engine->mixBuses, 
-                                                      engine->numMixBuses);
+                                                      engine->engineData.mixBuses, 
+                                                      engine->engineData.numMixBuses);
     KWL_ASSERT(success != 0);
     return KWL_NO_ERROR;
 }
 
 kwlError kwlSoundEngine_unloadEngineDataBlocking(kwlSoundEngine* engine)
 {
-    if (engine->engineDataIsLoaded == 0)
+    if (engine->engineData.isLoaded == 0)
     {
         return KWL_NO_ERROR;
     }
@@ -2652,33 +2040,11 @@ kwlError kwlSoundEngine_unloadEngineDataBlocking(kwlSoundEngine* engine)
     KWL_ASSERT(result != 0);
     
     /*Block until the engine data has been unloaded.*/
-    while (engine->engineDataIsLoaded != 0)
+    while (engine->engineData.isLoaded != 0)
     {
         /*printf("waiting for mixer to stop data driven events and clear mix buses\n");*/
         kwlUpdate(0);
     }
-    
-    return KWL_NO_ERROR;
-}
-
-kwlError kwlSoundEngine_engineDataUnload(kwlSoundEngine* engine)
-{
-    /* Unload wave banks*/
-    int i;
-    for (i = 0; i < engine->numWaveBanks; i++)
-    {
-        kwlSoundEngine_unloadWaveBank(engine, &engine->waveBanks[i]);
-    }
-    
-    /* Free non-audio data*/
-    kwlSoundEngine_freeEventData(engine);
-    kwlSoundEngine_freeSoundData(engine);
-    kwlSoundEngine_freeMixPresetData(engine);
-    kwlSoundEngine_freeMixBusData(engine);
-    kwlSoundEngine_freeWaveBankData(engine);
-        
-    engine->engineDataIsLoaded = 0;
-    //engine->playingEventList = NULL;
     
     return KWL_NO_ERROR;
 }

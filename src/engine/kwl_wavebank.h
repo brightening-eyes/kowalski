@@ -26,10 +26,49 @@ freely, subject to the following restrictions:
 
 /*! \file */ 
 
+#include "kowalski.h"
+#include "kowalski_ext.h"
+#include "kwl_inputstream.h"
+#include "kwl_synchronization.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
+
+struct kwlSoundEngine;
+
+/** The number of bytes in the wave bank binary identifier. */
+#define KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH 9
+    
+/** 
+ * The file identifier for wave bank binaries, ie the sequence of bytes
+ * that all wave bank binary files start with.
+ */
+static const char KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER[KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH] =
+{
+    0xAB, 'K', 'W', 'B', 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
+};
+
+typedef void (*kwlWaveBankFinishedLoadingCallback)(kwlWaveBankHandle handle, void* userData);
+    
+/** 
+ * A struct containing everything needed to load
+ * a wave bank on a separate thread.
+ */
+typedef struct kwlWaveBankLoadingThread
+{
+    /** The thread to use for asyncronous loading. */
+    kwlThread thread;
+    /** The wave bank to load */
+    struct kwlWaveBank* waveBank;
+    /** The input stream to load from.*/
+    kwlInputStream inputStream;
+    /** A callback to invoke when loading is done.*/
+    kwlWaveBankFinishedLoadingCallback callback;
+    /** */
+    void* callbackUserData;
+} kwlWaveBankLoadingThread;
     
 /** 
  * A named collection of pieces of audio data.
@@ -46,8 +85,40 @@ typedef struct kwlWaveBank
     struct kwlAudioData* audioDataItems;
     /** The number of audio data entries in the wave bank. */
     int numAudioDataEntries;
+    /** Used for threaded loading (if requested). */
+    kwlWaveBankLoadingThread loadingThread;
 } kwlWaveBank;
 
+/** 
+ * Checks that a wave bank binary at a given path is valid with respect to 
+ * currently loaded engine data.
+ */    
+kwlError kwlWaveBank_verifyWaveBankBinary(struct kwlSoundEngine* engine, 
+                                          const char* const waveBankPath,
+                                          kwlWaveBank** waveBank);
+    
+/**
+ * Loads all audio data items from a given input stream. The stream is assumed
+ * to be a valid wave bank data stream.
+ */
+kwlError kwlWaveBank_loadAudioDataItems(kwlWaveBank* waveBank, kwlInputStream* inputStream);
+    
+/**
+ * Load wave bank audio data from a file at a given path. If callback is not NULL, this method returns immediately and 
+ * loading is performed in a separate thread and the callback gets invoked when loading finishes.
+ * If callback is NULL, this function returns when all data has been loaded.
+ */
+kwlError kwlWaveBank_loadAudioData(kwlWaveBank* waveBank, 
+                                   const char* path, 
+                                   int threaded,
+                                   kwlWaveBankFinishedLoadingCallback callback);
+    
+/** The entry point for the loading thread.*/
+void* kwlWaveBank_loadingThreadEntryPoint(void* userData);
+    
+/** */
+void kwlWaveBank_unload(kwlWaveBank* waveBank);
+    
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */    

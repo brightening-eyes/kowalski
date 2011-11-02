@@ -44,8 +44,17 @@
 		C136324113851FA9002CD5C2 /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
 		C136324213851FA9002CD5C2 /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
 		C136324313851FA9002CD5C2 /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
+		C166D353146072F700FB60DD /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
+		C166D354146072F700FB60DD /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
+		C166D355146072F700FB60DD /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
 		C167E65D12EF1015002268B1 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C167E65C12EF1015002268B1 /* SDL.framework */; };
 		C167E6D012EF16B4002268B1 /* SDL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C167E65C12EF1015002268B1 /* SDL.framework */; };
+		C1702E591461645B00ADE4F7 /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
+		C1702E5A1461645B00ADE4F7 /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
+		C1702E5B1461645B00ADE4F7 /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
+		C1702E5C1461645B00ADE4F7 /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
+		C1702E5D1461645B00ADE4F7 /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
+		C1702E5E1461645B00ADE4F7 /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
 		C186B33511C3F225003D0013 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1655C5D1171B9AE004021DB /* libportaudio.a */; };
 		C192DBB11274391100852CBC /* kwl_audiodata.c in Sources */ = {isa = PBXBuildFile; fileRef = C192DBB01274391100852CBC /* kwl_audiodata.c */; };
 		C192DBB21274391100852CBC /* kwl_audiodata.c in Sources */ = {isa = PBXBuildFile; fileRef = C192DBB01274391100852CBC /* kwl_audiodata.c */; };
@@ -490,9 +499,12 @@
 		C161A23B12B4F56500B1E5AD /* sfx.kwb */ = {isa = PBXFileReference; lastKnownFileType = file; name = sfx.kwb; path = ../../res/demodata/final/sfx.kwb; sourceTree = SOURCE_ROOT; };
 		C1655B891171B705004021DB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		C1655C5D1171B9AE004021DB /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = ../../lib/portaudio/osx/libportaudio.a; sourceTree = SOURCE_ROOT; };
+		C166D352146072F700FB60DD /* kwl_wavebank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kwl_wavebank.c; sourceTree = "<group>"; };
 		C16747CF11A9595D000A2D70 /* kwl_synchronization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kwl_synchronization.h; sourceTree = "<group>"; };
 		C16747D011A9595D000A2D70 /* kwl_synchronization_pthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kwl_synchronization_pthread.c; sourceTree = "<group>"; };
 		C167E65C12EF1015002268B1 /* SDL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = SDL.framework; path = ../../lib/SDL.framework; sourceTree = SOURCE_ROOT; };
+		C1702E571461645B00ADE4F7 /* kwl_enginedata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kwl_enginedata.h; sourceTree = "<group>"; };
+		C1702E581461645B00ADE4F7 /* kwl_enginedata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kwl_enginedata.c; sourceTree = "<group>"; };
 		C1820E2F12E9621B00E1BD7A /* kwl_positionalaudiosettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kwl_positionalaudiosettings.c; sourceTree = "<group>"; };
 		C192DBB01274391100852CBC /* kwl_audiodata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kwl_audiodata.c; sourceTree = "<group>"; };
 		C195518511C8FD8F00FE59BA /* kwl_memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kwl_memory.c; sourceTree = "<group>"; };
@@ -716,6 +728,8 @@
 				C19FD67E141AC72900B836F5 /* kwl_decoder_pcm.h */,
 				C19FD67F141AC72900B836F5 /* kwl_decoder_pcm.c */,
 				C136324013851FA9002CD5C2 /* kwl_dspunit.h */,
+				C1702E571461645B00ADE4F7 /* kwl_enginedata.h */,
+				C1702E581461645B00ADE4F7 /* kwl_enginedata.c */,
 				C127F069117F189400C9A250 /* kwl_event.c */,
 				C127F06A117F189400C9A250 /* kwl_event.h */,
 				C1A018C11265EF120039DB22 /* kwl_eventdefinition.h */,
@@ -743,6 +757,7 @@
 				C16747D011A9595D000A2D70 /* kwl_synchronization_pthread.c */,
 				C1988DCA1411006E00E5A561 /* kwl_synchronization_win.c */,
 				C127F080117F189400C9A250 /* kwl_wavebank.h */,
+				C166D352146072F700FB60DD /* kwl_wavebank.c */,
 			);
 			name = engine;
 			path = ../../src/engine;
@@ -989,6 +1004,7 @@
 				C1F0C64C13DA3ED600E05434 /* SoundEmitter.h in Headers */,
 				C1F0C64E13DA3ED600E05434 /* SDLMain.h in Headers */,
 				C19FD684141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */,
+				C1702E591461645B00ADE4F7 /* kwl_enginedata.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1067,6 +1083,7 @@
 				C1F0C5D013DA3ED600E05434 /* SoundEmitter.h in Headers */,
 				C1F0C5D213DA3ED600E05434 /* SDLMain.h in Headers */,
 				C19FD680141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */,
+				C1702E5B1461645B00ADE4F7 /* kwl_enginedata.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1143,6 +1160,7 @@
 				C1F0C60E13DA3ED600E05434 /* SoundEmitter.h in Headers */,
 				C1F0C61013DA3ED600E05434 /* SDLMain.h in Headers */,
 				C19FD682141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */,
+				C1702E5D1461645B00ADE4F7 /* kwl_enginedata.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1313,6 +1331,8 @@
 				C1F0C64F13DA3ED600E05434 /* SDLMain.m in Sources */,
 				C1F0C65013DA3ED600E05434 /* fileutil.cpp in Sources */,
 				C19FD685141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */,
+				C166D354146072F700FB60DD /* kwl_wavebank.c in Sources */,
+				C1702E5A1461645B00ADE4F7 /* kwl_enginedata.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1414,6 +1434,8 @@
 				C1DD3C821370D1C300D10AA6 /* block.c in Sources */,
 				C1DD3C831370D1C300D10AA6 /* bitwise.c in Sources */,
 				C19FD681141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */,
+				C166D353146072F700FB60DD /* kwl_wavebank.c in Sources */,
+				C1702E5C1461645B00ADE4F7 /* kwl_enginedata.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1483,6 +1505,8 @@
 				C1F0C61113DA3ED600E05434 /* SDLMain.m in Sources */,
 				C1F0C61213DA3ED600E05434 /* fileutil.cpp in Sources */,
 				C19FD683141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */,
+				C166D355146072F700FB60DD /* kwl_wavebank.c in Sources */,
+				C1702E5E1461645B00ADE4F7 /* kwl_enginedata.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
