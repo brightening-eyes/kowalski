@@ -113,6 +113,8 @@ typedef enum
     /** There is not a one-to-one correspondence between the audio data entry ids in a 
     wave bank binary file and the ids in the corresponding wave bank structure in the engine.*/
     KWL_WAVE_BANK_ENTRY_MISMATCH,
+    /** The contents of a binary file is currupt.*/
+    KWL_CORRUPT_BINARY_DATA,
     /** The data of a streaming event has an unsupported encoding.*/
     KWL_UNSUPPORTED_ENCODING,
     /** All decoder instances are in use. */
@@ -900,7 +902,7 @@ unsigned int kwlGetNumFramesMixed();
  * @see kwlGetError
  */
 kwlWaveBankHandle kwlWaveBankLoad(const char* const fileName);
-
+    
 /**
  * <p>Unloads the audio data of a given wave bank. If the wave bank is not
  * loaded, this method does nothing. Any currently playing events
@@ -1080,7 +1082,7 @@ void kwlEngineDataUnload();
  * @see kwlGetError
  */
 int kwlEngineDataIsLoaded();
-    
+
 /**
  * <p>Resume the Kowalski engine mixer. If the mixer is not paused, this method does nothing.<p>
  * <strong>Error codes:</strong>

@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 
 #include "kowalski.h"
 #include "kwl_audiodata.h"
+#include "kwl_enginedata.h"
 #include "kwl_dspunit.h"
 #include "kwl_event.h"
 #include "kwl_inputstream.h"
@@ -42,67 +43,15 @@ freely, subject to the following restrictions:
 extern "C"
 {
 #endif /* __cplusplus */
-
-/***********************************************************************
- * Sound engine constants.
- ***********************************************************************/
-/** 
- * The file identifier for wave bank binaries, ie the sequence of bytes
- * that all wave bank binary files start with.
- */
-static const char KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER[9] =
-{
-    0xAB, 'K', 'W', 'B', 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
-};
     
-/** The number of bytes in the wave bank binary identifier. */
-static const int KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH = 9;
-    
-/** 
- * The file identifier for engine binaries, ie the sequence of bytes
- * that all engine data binary files start with.
- */
-static const char KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER[9] =
-{
-    0xAB, 'K', 'W', 'L', 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
-};
-    
-/** The number of bytes in the engine data identifier.*/
-static const int KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER_LENGTH = 9;
-    
-/** The ID of the event data chunk in an engine data binary file. */
-static const int KWL_EVENTS_CHUNK_ID = 0x73747665;
-    
-/** The ID of the sound data chunk in an engine data binary file. */
-static const int KWL_SOUNDS_CHUNK_ID = 0x73646e73;
-    
-/** The ID of the mix bus data chunk in an engine data binary file. */
-static const int KWL_MIX_BUSES_CHUNK_ID = 0x7362786d;
-    
-/** The ID of the mix preset data chunk in an engine data binary file. */
-static const int KWL_MIX_PRESETS_CHUNK_ID = 0x7270786d;
-    
-/** The ID of the wave bank data chunk in an engine data binary file. */
-static const int KWL_WAVE_BANKS_CHUNK_ID = 0x736b6277;
-
 /***********************************************************************
  * Sound engine struct.
  ***********************************************************************/
 /** A struct representing the singleton Kowalski sound engine. */
 typedef struct kwlSoundEngine
 {
-    /** Zero if no engine data is loaded, non-zero otherwise. */
-    int engineDataIsLoaded;
-    
     /** The software mixer responsible for generating the final output buffers. */
     kwlSoftwareMixer* mixer;
-
-    /** The number of mix buses.*/
-    int numMixBuses;
-    /** */
-    kwlMixBus* mixBuses;
-    /** */
-    kwlMixBus* masterBus;
     
     /** A message queue that incoming messages from the mixer thread get copied to and then processed. */
     kwlMessageQueue fromMixerQueue;
@@ -115,40 +64,12 @@ typedef struct kwlSoundEngine
     kwlMessageQueue toMixerQueueShared;
     /** A struct containing information about the current 3D audio listener. */
     kwlPositionalAudioListener listener;
-
-    /** The number of wave banks */
-    int numWaveBanks;
-    /** An array of wave banks */
-    kwlWaveBank* waveBanks;
-
-    /** The number of mix presets. */
-    int numMixPresets;
-    /** An array of mix presets. */
-    kwlMixPreset* mixPresets;
-    /** The number of seconds it takes to fade between mix presets.*/
-    float mixPresetFadeTime;
     
-    /** The total number of audio data entries. */
-    int totalNumAudioDataEntries;
-    /** An array of audio data entries that may or may not contain loaded audio data. */
-    kwlAudioData* audioDataEntries;
-
-    /** The current number of event definitions read from engine data.*/
-    int numEventDefinitions;
-    /** An array of arrays of definitions read from data. */
-    struct kwlEventDefinition* eventDefinitions;
-    /** An array of arrays of event instances read from data. Instance i of event definition j is at [j][i]. */
-    struct kwlEvent** events;
     /** The current size of the array of freeform events, i.e events created in code.*/
     int freeformEventArraySize;
     /** An array of freeform events, i.e events created in code. This array is dynamically resized and may contain null entries. */
     struct kwlEvent** freeformEvents;
-
-    /** The number of sound definitions currently loaded from engine data.*/
-    int numSoundDefinitions;
-    /** An array of sound definitions. */
-    struct kwlSound* sounds;
-
+    
     int isInputEnabled;
     
     long long lastNumFramesMixed;
@@ -166,6 +87,8 @@ typedef struct kwlSoundEngine
     kwlPositionalAudioSettings positionalAudioSettings;
     /** */
     kwlMutexLock mainMutexLock;
+    /** The currently loaded engine data.*/
+    kwlEngineData engineData;
 
 } kwlSoundEngine; 
     
@@ -356,7 +279,7 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStep);
 kwlError kwlSoundEngine_initialize(kwlSoundEngine* engine, int sampleRate, int numOutChannels, int numInChannels, int bufferSize);
     
 /** */
-kwlError kwlSoundEngine_engineDataIsLoaded(kwlSoundEngine* engine, int* ret);
+kwlError kwlSoundEngine_isLoaded(kwlSoundEngine* engine, int* ret);
     
 /** */
 kwlError kwlSoundEngine_engineDataLoad(kwlSoundEngine* engine, const char* const dataFile);
@@ -373,44 +296,15 @@ void kwlSoundEngine_deinitialize(kwlSoundEngine* engine);
 /***********************************************************************
  * Data loading/unloading methods
  ***********************************************************************/
-/** Loads non-audio data (ie engine data) from a given stream. */
-kwlError kwlSoundEngine_loadNonAudioData(kwlSoundEngine* engine, kwlInputStream* stream);
-    
-/** Moves the read pointer of a given stream to the first data byte of a chunk with a given id */
-void kwlSoundEngine_seekToEngineDataChunk(kwlSoundEngine* engine, kwlInputStream* stream, int chunkId);
-
-/** Loads mix bus data from a given file stream.*/
-void kwlSoundEngine_loadMixBusData(kwlSoundEngine* engine, kwlInputStream* stream);
-
-/** Loads mix preset data from a given file stream.*/
-void kwlSoundEngine_loadMixPresetData(kwlSoundEngine* engine, kwlInputStream* stream);
-    
-/** Releases any currently loaded mix preset data. */
-void kwlSoundEngine_freeMixPresetData(kwlSoundEngine* engine);
-        
-/** Releases any currently loaded mix bus data. */
-void kwlSoundEngine_freeMixBusData(kwlSoundEngine* engine);
-
-/** Loads event bus data from a given file stream.*/
-void kwlSoundEngine_loadEventData(kwlSoundEngine* engine, kwlInputStream* stream);
-
-/** Releases any currently loaded event data. */
-void kwlSoundEngine_freeEventData(kwlSoundEngine* engine);
-    
-/** Loads sound data from a given file stream.*/
-void kwlSoundEngine_loadSoundData(kwlSoundEngine* engine, kwlInputStream* stream);
-
-/** Releases any currently loaded sound data. */
-void kwlSoundEngine_freeSoundData(kwlSoundEngine* engine);
-
-/** Loads wave bank data (not including audio data) from a given file stream.*/
-void kwlSoundEngine_loadWaveBankData(kwlSoundEngine* engine, kwlInputStream* stream);
-    
-/** Releases any currently loaded wave bank data. */
-void kwlSoundEngine_freeWaveBankData(kwlSoundEngine* engine);
+/** Loads engine data (ie non-audio data) from a given stream. */
+kwlError kwlSoundEngine_loadEngineData(kwlSoundEngine* engine, kwlInputStream* stream);
     
 /** Loads the audio data entries in Kowalski wave bank binary file. */
-kwlError kwlSoundEngine_loadWaveBank(kwlSoundEngine* engine, const char* const waveBankFile, kwlWaveBankHandle* handle);
+kwlError kwlSoundEngine_loadWaveBank(kwlSoundEngine* engine, 
+                                     const char* const waveBankFile, 
+                                     kwlWaveBankHandle* handle,
+                                     int threaded,
+                                     kwlWaveBankFinishedLoadingCallback callback);
 
 /** */
 kwlError kwlSoundEngine_waveBankIsLoaded(kwlSoundEngine* engine, kwlWaveBankHandle handle, int* isLoaded);
@@ -422,7 +316,7 @@ kwlError kwlSoundEngine_waveBankIsReferencedByPlayingEvent(kwlSoundEngine* engin
 kwlError kwlSoundEngine_requestUnloadWaveBank(kwlSoundEngine* engine, kwlWaveBankHandle waveBankHandle, int blockUntilUnloaded);
 
 /** */
-kwlError kwlSoundEngine_unloadWaveBank(kwlSoundEngine* engine, kwlWaveBank* waveBank);
+kwlWaveBankHandle kwlSoundEngine_getHandleFromWaveBank(kwlSoundEngine* engine, kwlWaveBank* waveBank);
 
 /** */
 kwlError kwlSoundEngine_getNumFramesMixed(kwlSoundEngine* engine, unsigned int* numFrames);

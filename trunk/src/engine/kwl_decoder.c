@@ -203,6 +203,8 @@ void* kwlDecoder_decodingLoop(void* data)
             return NULL;
         }
     }
+    
+    return NULL;
 }
 
 int kwlDecoder_decodeNewBufferForEvent(kwlDecoder* decoder, kwlEvent* event)
