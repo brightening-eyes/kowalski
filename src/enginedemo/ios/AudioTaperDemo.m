@@ -48,7 +48,6 @@ freely, subject to the following restrictions:
     {
         kwlEventStart(m_eventHandle);
     }
-    
 }
 
 -(void)initialize

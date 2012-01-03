@@ -37,7 +37,7 @@ extern "C"
 
 struct kwlWaveBank;
     
-/** The number of bytes in the engine data identifier.*/
+/** The number of bytes in the engine data file identifier.*/
 #define KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER_LENGTH 9
     
 /** The ID of the event data chunk in an engine data binary file. */
@@ -97,7 +97,7 @@ typedef struct kwlEngineData
     
     /** The current number of event definitions read from engine data.*/
     int numEventDefinitions;
-    /** An array of arrays of definitions read from data. */
+    /** An array of event definitions read from data. */
     struct kwlEventDefinition* eventDefinitions;
     /** An array of arrays of event instances read from data. Instance i of event definition j is at [j][i]. */
     struct kwlEvent** events;

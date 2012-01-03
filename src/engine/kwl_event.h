@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 extern "C"
 {
 #endif /* __cplusplus */
-
+    
 /** An enumeration of valid event playback states.*/
 typedef enum
 {
@@ -165,6 +165,25 @@ void kwlEvent_init(kwlEvent* event);
  */
 void kwlEvent_start(kwlEvent* event);
 
+/** */
+kwlError kwlEvent_createFreeformEventFromBuffer(kwlEvent** event, 
+                                                kwlPCMBuffer* buffer, 
+                                                kwlEventType type);
+/** */
+kwlError kwlEvent_createFreeformEventFromFile(kwlEvent** event, 
+                                              const char* const audioFilePath, 
+                                              kwlEventType type, 
+                                              int streamFromDisk);
+    
+/** */
+kwlError kwlEvent_createFreeformEventFromAudioData(kwlEvent** event, 
+                                                   kwlAudioData* data, 
+                                                   kwlEventType type, 
+                                                   const char* eventId);
+    
+/** */
+void kwlEvent_releaseFreeformEvent(kwlEvent* event);
+    
 /**
  * Returns the number of remaining output frames the current buffer of this event
  * will produce, taking the current effective pitch into account. 

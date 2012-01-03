@@ -20,6 +20,7 @@ freely, subject to the following restrictions:
    3. This notice may not be removed or altered from any source
    distribution.
 */
+
 #include "kwl_asm.h"
 #include "kwl_audiodata.h"
 #include "kwl_audiofileutil.h"
@@ -172,13 +173,18 @@ void kwlSoundEngine_init(kwlSoundEngine* engine)
     kwlMemset(engine->decoders, 0, sizeof(kwlDecoder) * KWL_NUM_DECODERS);
     
     //set up main mutex lock
-    kwlMutexLockInit(&engine->mainMutexLock);
-    engine->mixer->mainMutexLock = &engine->mainMutexLock;
+    kwlMutexLockInit(&engine->mixerEngineMutexLock);
+    engine->mixer->mixerEngineMutexLock = &engine->mixerEngineMutexLock;
 }
 
 void kwlSoundEngine_free(kwlSoundEngine* engine)
 {
     KWL_ASSERT(engine != NULL);
+    
+    kwlMessageQueue_free(&engine->toMixerQueue);
+    kwlMessageQueue_free(&engine->toMixerQueueShared);
+    kwlMessageQueue_free(&engine->fromMixerQueue);
+    
     KWL_FREE(engine->decoders);
 }
 
@@ -188,11 +194,12 @@ kwlError kwlSoundEngine_loadWaveBank(kwlSoundEngine* engine,
                                      int threaded,
                                      kwlWaveBankFinishedLoadingCallback callback)
 {
-    /*TODO: handle the case of more than one wave bank sharing a piece of audio data.*/
     if (!engine->engineData.isLoaded)
     {
         return KWL_ENGINE_DATA_NOT_LOADED;
     }
+    
+    /*TODO: handle the case of more than one wave bank sharing a piece of audio data.*/
 
     /* Check that we have a valid wave bank binary file and that its entries match those
        in engine data.*/
@@ -203,6 +210,7 @@ kwlError kwlSoundEngine_loadWaveBank(kwlSoundEngine* engine,
     {
         return verifyResult;
     }
+    KWL_ASSERT(matchingWaveBank);
 
     /*If we made it this far, the wave bank binary data lines up with a wave
      bank structure of the engine so we're ready to load the audio data.*/
@@ -400,68 +408,8 @@ kwlError kwlSoundEngine_eventDefinitionGetHandle(kwlSoundEngine* engine,
     return KWL_UNKNOWN_EVENT_DEFINITION_ID;
 }
 
-kwlError kwlSoundEngine_eventCreateWithAudioData(kwlSoundEngine* engine, kwlAudioData* audioData, 
-                                                 kwlEventHandle* handle, kwlEventType type,
-                                                 const char* const eventId)
+void kwlSoundEngine_addFreeformEvent(kwlSoundEngine* engine, kwlEvent* event, kwlEventHandle* handle)
 {
-    /*create the event. as opposed to a data driven event, a freeform event does
-     not reference sounds and event definitions in the engine, but own its local data
-     that is freed when the event is released.*/
-    kwlEvent* createdEvent = (kwlEvent*)KWL_MALLOC(sizeof(kwlEvent), "freeform event instance");
-    kwlEvent_init(createdEvent);
-    
-    kwlSound* sound = NULL;
-    kwlAudioData* streamAudioData = NULL;
-    
-    /*create a sound if we loaded a PCM file.*/
-    if (audioData->encoding == KWL_ENCODING_SIGNED_16BIT_PCM)
-    {
-        sound = (kwlSound*)KWL_MALLOC(sizeof(kwlSound), "freeform event: sound");
-        kwlSound_init(sound);
-        sound->audioDataEntries = (kwlAudioData**)KWL_MALLOC(sizeof(kwlAudioData*), 
-                                                  "freeform event: sound audio data array list");
-        sound->audioDataEntries[0] = audioData;
-        sound->numAudioDataEntries = 1;
-        sound->playbackMode = KWL_SEQUENTIAL;
-        sound->playbackCount = 1;
-        sound->deferStop = 0;
-        sound->gain = 1.0f;
-        sound->pitch = 1.0f;
-        sound->pitchVariation = 0.0f;
-        sound->gainVariation = 0.0f;
-    }
-    else
-    {
-        KWL_ASSERT(0 && "TODO: support creating non-pcm events");
-    }
-    
-    /*create an event definition*/
-    kwlEventDefinition* eventDefinition = 
-    (kwlEventDefinition*)KWL_MALLOC(sizeof(kwlEventDefinition), 
-                                    "freeform event definition");
-    kwlEventDefinition_init(eventDefinition);
-    
-    eventDefinition->id = eventId;
-    eventDefinition->instanceCount = 1;
-    eventDefinition->isPositional = type == KWL_POSITIONAL ? 1 : 0;
-    eventDefinition->gain = 1.0f;
-    eventDefinition->pitch = 1.0f;
-    eventDefinition->innerConeCosAngle = 1.0f;
-    eventDefinition->outerConeCosAngle = -1.0f;
-    eventDefinition->outerConeGain = 1.0f;
-    eventDefinition->retriggerMode = KWL_RETRIGGER;
-    eventDefinition->stealingMode = KWL_DONT_STEAL;
-    eventDefinition->streamAudioData = streamAudioData;
-    eventDefinition->sound = sound;
-    eventDefinition->numReferencedWaveBanks = 0;
-    eventDefinition->referencedWaveBanks = NULL;
-    /*Set the mix bus to NULL. This is how the mixer knows this is a freeform event.
-     TODO: solve this in some better way?*/
-    eventDefinition->mixBus = NULL;
-    
-    createdEvent->definition_mixer = eventDefinition;
-    createdEvent->definition_engine = eventDefinition;
-    
     /*find a free slot in the freeform event array. reallocate the array if needed */
     int slotIdx = -1;
     int i;
@@ -489,64 +437,38 @@ kwlError kwlSoundEngine_eventCreateWithAudioData(kwlSoundEngine* engine, kwlAudi
     *handle = computeEventHandle(slotIdx, 0, 1);
     //printf("slot idx %d, handle %d, event %d\n", slotIdx, *handle, createdEvent);
     
-    engine->freeformEvents[slotIdx] = createdEvent;
-    return KWL_NO_ERROR;
-    
+    engine->freeformEvents[slotIdx] = event;
 }
 
 kwlError kwlSoundEngine_eventCreateWithBuffer(kwlSoundEngine* engine, kwlPCMBuffer* buffer, 
                                               kwlEventHandle* handle, kwlEventType type)
 {
-    if (buffer->numFrames < 1 ||
-        buffer->numChannels < 1 || 
-        buffer->numChannels > 2 ||
-        buffer->pcmData == NULL)
+    *handle = KWL_INVALID_HANDLE;
+    kwlEvent* createdEvent = NULL;
+    kwlError result = kwlEvent_createFreeformEventFromBuffer(&createdEvent, buffer, type);
+    
+    if (result == KWL_NO_ERROR)
     {
-        return KWL_INVALID_PARAMETER_VALUE;
+        KWL_ASSERT(createdEvent != NULL);
+        kwlSoundEngine_addFreeformEvent(engine, createdEvent, handle);
     }
     
-    kwlAudioData* audioData = (kwlAudioData*)KWL_MALLOC(sizeof(kwlAudioData), 
-                                                        "freeform event audio data struct");
-    kwlMemset(audioData, 0, sizeof(kwlAudioData));
-    
-    audioData->numChannels = buffer->numChannels;
-    audioData->numFrames = buffer->numFrames;
-    audioData->numBytes = buffer->numFrames * buffer->numChannels * 2;/*2 bytes per 16 bit sample*/
-    audioData->bytes = buffer->pcmData;
-    audioData->encoding = KWL_ENCODING_SIGNED_16BIT_PCM;
-    
-    return kwlSoundEngine_eventCreateWithAudioData(engine, audioData, handle, type, "freeform buffer event");
+    return result;
 }
 
 kwlError kwlSoundEngine_eventCreateWithFile(kwlSoundEngine* engine, const char* const audioFilePath, 
                                             kwlEventHandle* handle, kwlEventType type, int streamFromDisk)
 {
-    *handle = KWL_INVALID_HANDLE;
+    kwlEvent* createdEvent = NULL;
+    kwlError result = kwlEvent_createFreeformEventFromFile(&createdEvent, audioFilePath, type, streamFromDisk);
     
-    KWL_ASSERT(streamFromDisk == 0 && "stream flag not supported yet");
-    
-    /*try to load the audio file data*/
-    kwlAudioData* audioData = (kwlAudioData*)KWL_MALLOC(sizeof(kwlAudioData), 
-                                                        "freeform event audio data struct");
-    kwlMemset(audioData, 0, sizeof(kwlAudioData));
-    
-    kwlError error = kwlLoadAudioFile(audioFilePath, audioData, KWL_CONVERT_TO_INT16_OR_FAIL);
-    if (error != KWL_NO_ERROR)
+    if (result == KWL_NO_ERROR)
     {
-        KWL_FREE(audioData);
-        return error;
+        KWL_ASSERT(createdEvent != NULL);
+        kwlSoundEngine_addFreeformEvent(engine, createdEvent, handle);
     }
     
-    if (type == KWL_POSITIONAL &&
-        audioData->numChannels != 1)
-    {
-        kwlAudioData_free(audioData);
-        KWL_FREE(audioData);
-        return KWL_POSITIONAL_EVENT_MUST_BE_MONO;
-    }
-        
-    
-    return kwlSoundEngine_eventCreateWithAudioData(engine, audioData, handle, type, (char*)audioFilePath);
+    return result;
 }
 
 kwlError kwlSoundEngine_unloadFreeformEvent(kwlSoundEngine* engine, kwlEvent* event)
@@ -567,39 +489,11 @@ kwlError kwlSoundEngine_unloadFreeformEvent(kwlSoundEngine* engine, kwlEvent* ev
     }
     
     KWL_ASSERT(matchFound != 0 && "trying to free a freeform event that is not in the engine's list");
-    
-    /*Free all data associate with the freeform event.*/
-    kwlEventDefinition* eventDefinition = event->definition_engine;
-    if (eventDefinition->streamAudioData != NULL)
-    {
-        KWL_ASSERT(0); /* double check this*/
-        kwlAudioData_free(eventDefinition->streamAudioData);
-        KWL_FREE(eventDefinition->streamAudioData);
-    }
-    else if (eventDefinition->sound != NULL)
-    {
-        /*TODO: this check could be more robust. it will cause a memory
-                leak for freeform events created from files with the name
-                "freeform buffer event"*/
-        if (strcmp(eventDefinition->id, "freeform buffer event") == 0)
-        {
-            /*don't release audio data buffer for freeform buffer events.*/
-            eventDefinition->sound->audioDataEntries[0]->bytes = NULL;
-        }
-        /* Free loaded audio data */
-        kwlAudioData_free(eventDefinition->sound->audioDataEntries[0]);
-        /* Free allocated audio data and sound structs */
-        KWL_FREE(eventDefinition->sound->audioDataEntries[0]);
-        KWL_FREE(eventDefinition->sound->audioDataEntries);
-        KWL_FREE(eventDefinition->sound);
-    }
-    
-    /* Finally, free the event instance and the event definition. */
-    KWL_FREE(eventDefinition);
-    KWL_FREE(event);
-    
     /*Clear the event slot so it can be reused. */
     engine->freeformEvents[eventIndex] = NULL;
+    
+    /*Release event data.*/
+    kwlEvent_releaseFreeformEvent(event);
     
     return KWL_NO_ERROR;
 }
@@ -1226,7 +1120,7 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
       both the engine thread and the mixer thread, so a lock is required to 
       protect them. A minimum amount of work should be done in this section.
      **************************************************************************/
-    kwlMutexLockAcquire(&engine->mainMutexLock);
+    kwlMutexLockAcquire(&engine->mixerEngineMutexLock);
     
     /*Flush any locally buffered messages to the outgoing queue that is shared
       between the mixer thread and the engine thread.*/
@@ -1280,7 +1174,7 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
     /**************************************************************************
      done manipulating shared data. release the lock
      **************************************************************************/
-    kwlMutexLockRelease(&engine->mainMutexLock);
+    kwlMutexLockRelease(&engine->mixerEngineMutexLock);
     
     /*process messages from the mixer*/
     int numMessages = engine->fromMixerQueue.numMessages;
@@ -1302,8 +1196,8 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
             {
                 kwlDecoder_deinit(event->decoder);
             }
-            /*printf("    %s: %s\n", type == KWL_EVENT_STOPPED ? "event stopped" : "unload freeform event", 
-                   event->definition_engine->id);*/
+            printf("    %s: %s\n", type == KWL_EVENT_STOPPED ? "event stopped" : "unload freeform event", 
+                   event->definition_engine->id);
             kwlSoundEngine_removeEventFromPlayingList(engine, event);
             
             if (type == KWL_UNLOAD_FREEFORM_EVENT)
@@ -1319,13 +1213,14 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
         else if (type == KWL_UNLOAD_WAVEBANK)
         {
             kwlWaveBank* waveBank = (kwlWaveBank*)messageData;
-            //printf("    unload wave bank: %s\n", waveBank->id);
+            printf("    unload wave bank: %s\n", waveBank->id);
             kwlWaveBank_unload(waveBank);
         }
         else if (type == KWL_UNLOAD_ENGINE_DATA)
         {
             /*Unload engine data after all messages have been processed.*/
-            //printf("received KWL_UNLOAD_ENGINE_DATA\n");
+            KWL_ASSERT(unloadEngineDataRequested == 0);
+            printf("received KWL_UNLOAD_ENGINE_DATA\n");
             unloadEngineDataRequested = 1;
         }
     }
@@ -1851,11 +1746,11 @@ void debugPrintEventList(kwlEvent* event)
 /** */
 void kwlSoundEngine_addEventToPlayingList(kwlSoundEngine* engine, kwlEvent* eventToAdd)
 {
-    //printf("about to add %s to list:\n", eventToAdd->definition_engine->id);
+    printf("about to add %s to list:\n", eventToAdd->definition_engine->id);
     //debugPrintEventList(engine->playingEventList);
     
-    /*verify that the event is not already in the list
-    kwlEvent* temp = engine->playingEventList;
+    /*verify that the event is not already in the list*/
+    /*kwlEvent* temp = engine->playingEventList;
     if (temp != NULL)
     {
         while (temp != NULL)
@@ -1909,8 +1804,9 @@ void kwlSoundEngine_removeEventFromPlayingList(kwlSoundEngine* engine, kwlEvent*
     }
     
     event->nextEvent_engine = NULL;
+    
+    //printf("about to remove %s from list:\n", event->definition_engine->id);
     /*
-    printf("about to remove %s from list:\n", eventToRemove->definition_engine->id);
     debugPrintEventList(engine->playingEventList);
     
     //verify that the event is already in the list

@@ -21,6 +21,7 @@ freely, subject to the following restrictions:
    distribution.
 */
 
+#include <string.h>
 #include "kwl_messagequeue.h"
 
 void kwlMessageQueue_init(kwlMessageQueue* queue)
@@ -30,9 +31,10 @@ void kwlMessageQueue_init(kwlMessageQueue* queue)
     queue->numMessages = 0;
 }
 
-void kwlMessageQueue_clear(kwlMessageQueue* queue)
+void kwlMessageQueue_free(kwlMessageQueue* queue)
 {
-    queue->numMessages = 0;
+    KWL_FREE(queue->messages);
+    memset(queue, 0, sizeof(kwlMessageQueue));
 }
 
 void kwlMessageQueue_flushTo(kwlMessageQueue* srcQueue, kwlMessageQueue* destQueue)

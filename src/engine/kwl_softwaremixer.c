@@ -72,6 +72,10 @@ void kwlSoftwareMixer_free(kwlSoftwareMixer* mixer)
     KWL_FREE(mixer->tempMixBusBuffer);
     KWL_FREE(mixer->outBuffer);
     
+    kwlMessageQueue_free(&mixer->toEngineQueue);
+    kwlMessageQueue_free(&mixer->toEngineQueueShared);
+    kwlMessageQueue_free(&mixer->fromEngineQueue);
+    
     if (mixer->numInChannels > 0)
     {
         KWL_FREE(mixer->inBuffer);
@@ -87,7 +91,7 @@ void kwlSoftwareMixer_updateInput(kwlSoftwareMixer* mixer)
         It's better to miss an update here than to wait indefinitely for 
         the engine thread to release the lock, potentially leading to audio dropouts.
      */
-    if (kwlMutexLockTryAcquire(mixer->mainMutexLock) == KWL_LOCK_ACQUIRED)
+    if (kwlMutexLockTryAcquire(mixer->mixerEngineMutexLock) == KWL_LOCK_ACQUIRED)
     {
         mixer->inputDSPUnit.valueMixer = mixer->inputDSPUnit.valueShared;
         
@@ -97,7 +101,7 @@ void kwlSoftwareMixer_updateInput(kwlSoftwareMixer* mixer)
             dspUnit->updateDSPMixerCallback(dspUnit->data);
         }
         
-        kwlMutexLockRelease(mixer->mainMutexLock);
+        kwlMutexLockRelease(mixer->mixerEngineMutexLock);
     }
 }
 
@@ -108,7 +112,7 @@ void kwlSoftwareMixer_updateOutput(kwlSoftwareMixer* const mixer)
        It's better to miss an update here than to wait indefinitely for 
        the engine thread to release the lock, potentially leading to audio dropouts.
      */
-    if (kwlMutexLockTryAcquire(mixer->mainMutexLock) == KWL_LOCK_ACQUIRED)
+    if (kwlMutexLockTryAcquire(mixer->mixerEngineMutexLock) == KWL_LOCK_ACQUIRED)
     {   
         /*copy incoming messages*/
         kwlMessageQueue_flushTo(&mixer->engine->toMixerQueueShared, &mixer->fromEngineQueue);
@@ -178,7 +182,7 @@ void kwlSoftwareMixer_updateOutput(kwlSoftwareMixer* const mixer)
         mixer->isLevelMeteringEnabled.valueMixer = mixer->isLevelMeteringEnabled.valueShared;
         mixer->isPaused.valueMixer = mixer->isPaused.valueShared;
     
-        kwlMutexLockRelease(mixer->mainMutexLock);
+        kwlMutexLockRelease(mixer->mixerEngineMutexLock);
     }
 }
 
@@ -252,8 +256,10 @@ void kwlSoftwareMixer_processMessages(kwlSoftwareMixer* const mixer)
         else if (type == KWL_PREPARE_ENGINE_DATA_UNLOAD)
         {
             kwlSoftwareMixer_stopAllDataDrivenEvents(mixer);
-            int result = kwlMessageQueue_addMessage(&mixer->toEngineQueue, KWL_UNLOAD_ENGINE_DATA, NULL);
-            KWL_ASSERT(result == 1 && "mixer: outgoing message queue exhausted ");
+            //printf("mixer: got KWL_PREPARE_ENGINE_DATA_UNLOAD, sending KWL_UNLOAD_ENGINE_DATA back to engine\n");
+            //int result = kwlMessageQueue_addMessage(&mixer->toEngineQueue, KWL_UNLOAD_ENGINE_DATA, NULL);
+            //KWL_ASSERT(result == 1 && "mixer: outgoing message queue exhausted ");
+            KWL_ASSERT(mixer->resetMixBusesRequested == 0);
             mixer->resetMixBusesRequested = 1;
         }
         else if (type == KWL_EVENT_STOP)

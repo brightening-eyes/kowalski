@@ -62,6 +62,12 @@ typedef struct kwlSoundEngine
      * must be acquired prior to any manipulation to protect the data.
      */
     kwlMessageQueue toMixerQueueShared;
+    /** 
+     * A mutex lock used to protect data shared between the engine and mixer threads, 
+     * like message queues.
+     */
+    kwlMutexLock mixerEngineMutexLock;
+    
     /** A struct containing information about the current 3D audio listener. */
     kwlPositionalAudioListener listener;
     
@@ -85,8 +91,7 @@ typedef struct kwlSoundEngine
     struct kwlEvent* playingEventList;
     /** A collection of positional audio parameters.*/
     kwlPositionalAudioSettings positionalAudioSettings;
-    /** */
-    kwlMutexLock mainMutexLock;
+    
     /** The currently loaded engine data.*/
     kwlEngineData engineData;
 
@@ -108,11 +113,6 @@ kwlError kwlSoundEngine_eventGetHandle(kwlSoundEngine* engine, const char* const
 kwlError kwlSoundEngine_eventDefinitionGetHandle(kwlSoundEngine* engine, 
                                                  const char* const eventDefinitionID, 
                                                  kwlEventDefinitionHandle* handle);
-
-/** */
-kwlError kwlSoundEngine_eventCreateWithAudioData(kwlSoundEngine* engine, kwlAudioData* audioData, 
-                                                 kwlEventHandle* handle, kwlEventType type,
-                                                 const char* const eventId);
 
 /** */
 kwlError kwlSoundEngine_eventCreateWithBuffer(kwlSoundEngine* engine, kwlPCMBuffer* buffer, 

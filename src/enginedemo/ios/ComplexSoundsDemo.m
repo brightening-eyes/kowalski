@@ -118,7 +118,7 @@
     {
         m_eventHandles[i] = kwlEventGetHandle(m_eventIDs[i]);
         kwlError e = kwlGetError();
-        printf("ev id %s\n", m_eventIDs[i]);
+        //printf("ev id %s\n", m_eventIDs[i]);
         assert(e == KWL_NO_ERROR);
     }
     
