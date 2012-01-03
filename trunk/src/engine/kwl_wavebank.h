@@ -38,7 +38,7 @@ extern "C"
 
 struct kwlSoundEngine;
 
-/** The number of bytes in the wave bank binary identifier. */
+/** The number of bytes in the wave bank file identifier. */
 #define KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH 9
     
 /** 
@@ -77,8 +77,8 @@ typedef struct kwlWaveBank
 {
     /** The ID of the wave bank. */
     const char* id;
-    /* Non-zero if the wave bank is loaded, zero otherwise*/
-    char isLoaded;
+    /** Non-zero if the wave bank is loaded, zero otherwise*/
+    int isLoaded;
     /** The path to the wave bank file. Empty if the wave bank is not loaded.*/
     char *waveBankFilePath;
     /** An array of audio data entries for the wave bank. */

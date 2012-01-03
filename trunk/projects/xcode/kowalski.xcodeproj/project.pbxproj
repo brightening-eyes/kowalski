@@ -43,35 +43,24 @@
 		C123316712445213001796D2 /* window.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F581212AF80008DFEB2 /* window.h */; };
 		C136324113851FA9002CD5C2 /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
 		C136324213851FA9002CD5C2 /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
-		C136324313851FA9002CD5C2 /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
 		C166D353146072F700FB60DD /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
-		C166D354146072F700FB60DD /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
 		C166D355146072F700FB60DD /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
 		C167E65D12EF1015002268B1 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C167E65C12EF1015002268B1 /* SDL.framework */; };
 		C167E6D012EF16B4002268B1 /* SDL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C167E65C12EF1015002268B1 /* SDL.framework */; };
-		C1702E591461645B00ADE4F7 /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
-		C1702E5A1461645B00ADE4F7 /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
 		C1702E5B1461645B00ADE4F7 /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
 		C1702E5C1461645B00ADE4F7 /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
 		C1702E5D1461645B00ADE4F7 /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
 		C1702E5E1461645B00ADE4F7 /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
 		C186B33511C3F225003D0013 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1655C5D1171B9AE004021DB /* libportaudio.a */; };
-		C192DBB11274391100852CBC /* kwl_audiodata.c in Sources */ = {isa = PBXBuildFile; fileRef = C192DBB01274391100852CBC /* kwl_audiodata.c */; };
 		C192DBB21274391100852CBC /* kwl_audiodata.c in Sources */ = {isa = PBXBuildFile; fileRef = C192DBB01274391100852CBC /* kwl_audiodata.c */; };
 		C19FD680141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */ = {isa = PBXBuildFile; fileRef = C19FD67E141AC72900B836F5 /* kwl_decoder_pcm.h */; };
 		C19FD681141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = C19FD67F141AC72900B836F5 /* kwl_decoder_pcm.c */; };
 		C19FD682141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */ = {isa = PBXBuildFile; fileRef = C19FD67E141AC72900B836F5 /* kwl_decoder_pcm.h */; };
 		C19FD683141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = C19FD67F141AC72900B836F5 /* kwl_decoder_pcm.c */; };
-		C19FD684141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */ = {isa = PBXBuildFile; fileRef = C19FD67E141AC72900B836F5 /* kwl_decoder_pcm.h */; };
-		C19FD685141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = C19FD67F141AC72900B836F5 /* kwl_decoder_pcm.c */; };
 		C1A018C31265EF120039DB22 /* kwl_eventdefinition.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A018C11265EF120039DB22 /* kwl_eventdefinition.h */; };
 		C1A018C41265EF120039DB22 /* kwl_eventdefinition.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A018C21265EF120039DB22 /* kwl_eventdefinition.c */; };
-		C1A018C51265EF120039DB22 /* kwl_eventdefinition.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A018C11265EF120039DB22 /* kwl_eventdefinition.h */; };
-		C1A018C61265EF120039DB22 /* kwl_eventdefinition.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A018C21265EF120039DB22 /* kwl_eventdefinition.c */; };
 		C1A77322126C647C00B6B1C4 /* kwl_audiofileutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A77320126C647C00B6B1C4 /* kwl_audiofileutil.h */; };
 		C1A77323126C647C00B6B1C4 /* kwl_audiofileutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A77321126C647C00B6B1C4 /* kwl_audiofileutil.c */; };
-		C1A77324126C647C00B6B1C4 /* kwl_audiofileutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A77320126C647C00B6B1C4 /* kwl_audiofileutil.h */; };
-		C1A77325126C647C00B6B1C4 /* kwl_audiofileutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A77321126C647C00B6B1C4 /* kwl_audiofileutil.c */; };
 		C1AD43A212B9D2090034B985 /* libkowalski.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libkowalski.dylib */; };
 		C1AD43A512B9D27F0034B985 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1C25E8C12633C6D007D17F6 /* Cocoa.framework */; };
 		C1AD43A612B9D2840034B985 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C160EDAA11BA3F1E0047DCD9 /* AudioToolbox.framework */; };
@@ -97,6 +86,88 @@
 		C1AD43CD12B9D2CC0034B985 /* numbers.kwb in Resources */ = {isa = PBXBuildFile; fileRef = C1BB185712A5D04E0006CEA6 /* numbers.kwb */; };
 		C1AD449312B9D4AD0034B985 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = C1AD449212B9D4AD0034B985 /* icon.icns */; };
 		C1AD457B12B9E0F30034B985 /* Kowalski Demo.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = C1AD431112B9D14F0034B985 /* Kowalski Demo.app */; };
+		C1AE00001472B80300AFC66F /* mdct.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F4A1212AF80008DFEB2 /* mdct.c */; };
+		C1AE00011472B80300AFC66F /* mdct.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F4B1212AF80008DFEB2 /* mdct.h */; };
+		C1AE00021472B80300AFC66F /* misc.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F4C1212AF80008DFEB2 /* misc.h */; };
+		C1AE00031472B80300AFC66F /* ogg.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F4D1212AF80008DFEB2 /* ogg.h */; };
+		C1AE00041472B80300AFC66F /* os_types.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F4E1212AF80008DFEB2 /* os_types.h */; };
+		C1AE00051472B80300AFC66F /* os.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F4F1212AF80008DFEB2 /* os.h */; };
+		C1AE00061472B80300AFC66F /* registry.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F501212AF80008DFEB2 /* registry.c */; };
+		C1AE00071472B80300AFC66F /* registry.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F511212AF80008DFEB2 /* registry.h */; };
+		C1AE00081472B80300AFC66F /* res012.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F521212AF80008DFEB2 /* res012.c */; };
+		C1AE00091472B80300AFC66F /* sharedbook.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F531212AF80008DFEB2 /* sharedbook.c */; };
+		C1AE000A1472B80300AFC66F /* synthesis.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F541212AF80008DFEB2 /* synthesis.c */; };
+		C1AE000B1472B80300AFC66F /* vorbisfile.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F551212AF80008DFEB2 /* vorbisfile.c */; };
+		C1AE000C1472B80300AFC66F /* window_lookup.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F561212AF80008DFEB2 /* window_lookup.h */; };
+		C1AE000D1472B80300AFC66F /* window.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F571212AF80008DFEB2 /* window.c */; };
+		C1AE000E1472B80300AFC66F /* window.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F581212AF80008DFEB2 /* window.h */; };
+		C1AEFFA91472B68500AFC66F /* kowalski.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F073117F189400C9A250 /* kowalski.h */; };
+		C1AEFFAA1472B68500AFC66F /* kowalski.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F072117F189400C9A250 /* kowalski.c */; };
+		C1AEFFAB1472B68500AFC66F /* kowalski_ext.h in Headers */ = {isa = PBXBuildFile; fileRef = C1D1C14611B244AE0066C262 /* kowalski_ext.h */; };
+		C1AEFFAC1472B68500AFC66F /* kwl_asm.h in Headers */ = {isa = PBXBuildFile; fileRef = C1CDEF10127AD8090054F870 /* kwl_asm.h */; };
+		C1AEFFAD1472B68500AFC66F /* kwl_assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C13B88B41182DC7400F4F461 /* kwl_assert.h */; };
+		C1AEFFAE1472B68500AFC66F /* kwl_audiodata.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F082117F189400C9A250 /* kwl_audiodata.h */; };
+		C1AEFFAF1472B68500AFC66F /* kwl_audiodata.c in Sources */ = {isa = PBXBuildFile; fileRef = C192DBB01274391100852CBC /* kwl_audiodata.c */; };
+		C1AEFFB01472B68500AFC66F /* kwl_audiofileutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A77320126C647C00B6B1C4 /* kwl_audiofileutil.h */; };
+		C1AEFFB11472B68500AFC66F /* kwl_audiofileutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A77321126C647C00B6B1C4 /* kwl_audiofileutil.c */; };
+		C1AEFFB21472B68500AFC66F /* kwl_decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F064117F189400C9A250 /* kwl_decoder.h */; };
+		C1AEFFB31472B68500AFC66F /* kwl_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F063117F189400C9A250 /* kwl_decoder.c */; };
+		C1AEFFB41472B68500AFC66F /* kwl_decoder_imaadpcm.h in Headers */ = {isa = PBXBuildFile; fileRef = C12054C911D223C800BE5628 /* kwl_decoder_imaadpcm.h */; };
+		C1AEFFB51472B68500AFC66F /* kwl_decoder_imaadpcm.c in Sources */ = {isa = PBXBuildFile; fileRef = C12054CA11D223C800BE5628 /* kwl_decoder_imaadpcm.c */; };
+		C1AEFFB61472B68500AFC66F /* kwl_decoder_oggvorbis.h in Headers */ = {isa = PBXBuildFile; fileRef = C12054BA11D2233E00BE5628 /* kwl_decoder_oggvorbis.h */; };
+		C1AEFFB71472B68500AFC66F /* kwl_decoder_oggvorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = C12054BB11D2233E00BE5628 /* kwl_decoder_oggvorbis.c */; };
+		C1AEFFB81472B68500AFC66F /* kwl_decoder_pcm.h in Headers */ = {isa = PBXBuildFile; fileRef = C19FD67E141AC72900B836F5 /* kwl_decoder_pcm.h */; };
+		C1AEFFB91472B68500AFC66F /* kwl_decoder_pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = C19FD67F141AC72900B836F5 /* kwl_decoder_pcm.c */; };
+		C1AEFFBA1472B68500AFC66F /* kwl_dspunit.h in Headers */ = {isa = PBXBuildFile; fileRef = C136324013851FA9002CD5C2 /* kwl_dspunit.h */; };
+		C1AEFFBB1472B68500AFC66F /* kwl_enginedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C1702E571461645B00ADE4F7 /* kwl_enginedata.h */; };
+		C1AEFFBC1472B68500AFC66F /* kwl_enginedata.c in Sources */ = {isa = PBXBuildFile; fileRef = C1702E581461645B00ADE4F7 /* kwl_enginedata.c */; };
+		C1AEFFBD1472B68500AFC66F /* kwl_event.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F069117F189400C9A250 /* kwl_event.c */; };
+		C1AEFFBE1472B68500AFC66F /* kwl_event.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F06A117F189400C9A250 /* kwl_event.h */; };
+		C1AEFFBF1472B68500AFC66F /* kwl_eventdefinition.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A018C11265EF120039DB22 /* kwl_eventdefinition.h */; };
+		C1AEFFC01472B68500AFC66F /* kwl_eventdefinition.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A018C21265EF120039DB22 /* kwl_eventdefinition.c */; };
+		C1AEFFC11472B68500AFC66F /* kwl_inputstream.c in Sources */ = {isa = PBXBuildFile; fileRef = C11E0F4211A75E5400ADA909 /* kwl_inputstream.c */; };
+		C1AEFFC21472B68500AFC66F /* kwl_inputstream.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F067117F189400C9A250 /* kwl_inputstream.h */; };
+		C1AEFFC31472B68500AFC66F /* kwl_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = C195518511C8FD8F00FE59BA /* kwl_memory.c */; };
+		C1AEFFC41472B68500AFC66F /* kwl_memory.h in Headers */ = {isa = PBXBuildFile; fileRef = C195518611C8FD8F00FE59BA /* kwl_memory.h */; };
+		C1AEFFC51472B68500AFC66F /* kwl_messagequeue.h in Headers */ = {isa = PBXBuildFile; fileRef = C14F85A4120C4C080033D01F /* kwl_messagequeue.h */; };
+		C1AEFFC61472B68500AFC66F /* kwl_messagequeue.c in Sources */ = {isa = PBXBuildFile; fileRef = C14F85A5120C4C080033D01F /* kwl_messagequeue.c */; };
+		C1AEFFC71472B68500AFC66F /* kwl_mixbus.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F076117F189400C9A250 /* kwl_mixbus.c */; };
+		C1AEFFC81472B68500AFC66F /* kwl_mixbus.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F077117F189400C9A250 /* kwl_mixbus.h */; };
+		C1AEFFC91472B68500AFC66F /* kwl_mixpreset.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F0C7117F1A4600C9A250 /* kwl_mixpreset.h */; };
+		C1AEFFCA1472B68500AFC66F /* kwl_positionalaudiolistener.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F078117F189400C9A250 /* kwl_positionalaudiolistener.h */; };
+		C1AEFFCB1472B68500AFC66F /* kwl_positionalaudiolistener.c in Sources */ = {isa = PBXBuildFile; fileRef = C13F8D6412CF556300A30996 /* kwl_positionalaudiolistener.c */; };
+		C1AEFFCC1472B68500AFC66F /* kwl_positionalaudiosettings.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F079117F189400C9A250 /* kwl_positionalaudiosettings.h */; };
+		C1AEFFCD1472B68500AFC66F /* kwl_positionalaudiosettings.c in Sources */ = {isa = PBXBuildFile; fileRef = C1820E2F12E9621B00E1BD7A /* kwl_positionalaudiosettings.c */; };
+		C1AEFFCE1472B68500AFC66F /* kwl_softwaremixer.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F07A117F189400C9A250 /* kwl_softwaremixer.c */; };
+		C1AEFFCF1472B68500AFC66F /* kwl_softwaremixer.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F07B117F189400C9A250 /* kwl_softwaremixer.h */; };
+		C1AEFFD01472B68500AFC66F /* kwl_sound.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F07C117F189400C9A250 /* kwl_sound.c */; };
+		C1AEFFD11472B68500AFC66F /* kwl_sound.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F07D117F189400C9A250 /* kwl_sound.h */; };
+		C1AEFFD21472B68500AFC66F /* kwl_soundengine.c in Sources */ = {isa = PBXBuildFile; fileRef = C127F07E117F189400C9A250 /* kwl_soundengine.c */; };
+		C1AEFFD31472B68500AFC66F /* kwl_soundengine.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F068117F189400C9A250 /* kwl_soundengine.h */; };
+		C1AEFFD41472B68500AFC66F /* kwl_synchronization.h in Headers */ = {isa = PBXBuildFile; fileRef = C16747CF11A9595D000A2D70 /* kwl_synchronization.h */; };
+		C1AEFFD51472B68500AFC66F /* kwl_synchronization_pthread.c in Sources */ = {isa = PBXBuildFile; fileRef = C16747D011A9595D000A2D70 /* kwl_synchronization_pthread.c */; };
+		C1AEFFD71472B68500AFC66F /* kwl_wavebank.h in Headers */ = {isa = PBXBuildFile; fileRef = C127F080117F189400C9A250 /* kwl_wavebank.h */; };
+		C1AEFFD81472B68500AFC66F /* kwl_wavebank.c in Sources */ = {isa = PBXBuildFile; fileRef = C166D352146072F700FB60DD /* kwl_wavebank.c */; };
+		C1AEFFEC1472B7E000AFC66F /* kwl_soundengine_sdl.c in Sources */ = {isa = PBXBuildFile; fileRef = C1607734121678350041FE58 /* kwl_soundengine_sdl.c */; };
+		C1AEFFED1472B80300AFC66F /* asm_arm.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F351212AF80008DFEB2 /* asm_arm.h */; };
+		C1AEFFEE1472B80300AFC66F /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F361212AF80008DFEB2 /* bitwise.c */; };
+		C1AEFFEF1472B80300AFC66F /* backends.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F371212AF80008DFEB2 /* backends.h */; };
+		C1AEFFF01472B80300AFC66F /* block.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F381212AF80008DFEB2 /* block.c */; };
+		C1AEFFF11472B80300AFC66F /* tremor_block.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F391212AF80008DFEB2 /* tremor_block.h */; };
+		C1AEFFF21472B80300AFC66F /* codebook.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F3A1212AF80008DFEB2 /* codebook.c */; };
+		C1AEFFF31472B80300AFC66F /* codebook.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F3B1212AF80008DFEB2 /* codebook.h */; };
+		C1AEFFF41472B80300AFC66F /* codec_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F3C1212AF80008DFEB2 /* codec_internal.h */; };
+		C1AEFFF51472B80300AFC66F /* config_types.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F3D1212AF80008DFEB2 /* config_types.h */; };
+		C1AEFFF61472B80300AFC66F /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F3E1212AF80008DFEB2 /* config.h */; };
+		C1AEFFF71472B80300AFC66F /* floor0.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F3F1212AF80008DFEB2 /* floor0.c */; };
+		C1AEFFF81472B80300AFC66F /* floor1.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F401212AF80008DFEB2 /* floor1.c */; };
+		C1AEFFF91472B80300AFC66F /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F411212AF80008DFEB2 /* framing.c */; };
+		C1AEFFFA1472B80300AFC66F /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F421212AF80008DFEB2 /* info.c */; };
+		C1AEFFFB1472B80300AFC66F /* ivorbiscodec.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F441212AF80008DFEB2 /* ivorbiscodec.h */; };
+		C1AEFFFC1472B80300AFC66F /* ivorbisfile.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F461212AF80008DFEB2 /* ivorbisfile.h */; };
+		C1AEFFFD1472B80300AFC66F /* lsp_lookup.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F471212AF80008DFEB2 /* lsp_lookup.h */; };
+		C1AEFFFE1472B80300AFC66F /* mapping0.c in Sources */ = {isa = PBXBuildFile; fileRef = C1B77F481212AF80008DFEB2 /* mapping0.c */; };
+		C1AEFFFF1472B80300AFC66F /* mdct_lookup.h in Headers */ = {isa = PBXBuildFile; fileRef = C1B77F491212AF80008DFEB2 /* mdct_lookup.h */; };
 		C1BDF87813E207B10077D6B9 /* AudioMeteringDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C55D13DA3ED500E05434 /* AudioMeteringDemo.cpp */; };
 		C1BDF87913E207B10077D6B9 /* AudioMeteringDemo.h in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C55E13DA3ED500E05434 /* AudioMeteringDemo.h */; };
 		C1BDF87A13E207B10077D6B9 /* AudioTaperDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C55F13DA3ED500E05434 /* AudioTaperDemo.cpp */; };
@@ -150,7 +221,6 @@
 		C1BDF8AA13E207BB0077D6B9 /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C59213DA3ED600E05434 /* SDLMain.m */; };
 		C1CC927D13702AC600C41B6A /* kwl_positionalaudiolistener.c in Sources */ = {isa = PBXBuildFile; fileRef = C13F8D6412CF556300A30996 /* kwl_positionalaudiolistener.c */; };
 		C1CC927E13702AC600C41B6A /* kwl_positionalaudiosettings.c in Sources */ = {isa = PBXBuildFile; fileRef = C1820E2F12E9621B00E1BD7A /* kwl_positionalaudiosettings.c */; };
-		C1CDEF11127AD8090054F870 /* kwl_asm.h in Headers */ = {isa = PBXBuildFile; fileRef = C1CDEF10127AD8090054F870 /* kwl_asm.h */; };
 		C1CDEF12127AD8090054F870 /* kwl_asm.h in Headers */ = {isa = PBXBuildFile; fileRef = C1CDEF10127AD8090054F870 /* kwl_asm.h */; };
 		C1CF01FB1171D1A1007D7ACC /* libkowalski.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libkowalski.dylib */; };
 		C1DD3BBC1370CE3400D10AA6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1C25E411263384A007D17F6 /* OpenGL.framework */; };
@@ -344,58 +414,6 @@
 		C1F0C61013DA3ED600E05434 /* SDLMain.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C59113DA3ED600E05434 /* SDLMain.h */; };
 		C1F0C61113DA3ED600E05434 /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C59213DA3ED600E05434 /* SDLMain.m */; };
 		C1F0C61213DA3ED600E05434 /* fileutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C59413DA3ED600E05434 /* fileutil.cpp */; };
-		C1F0C61B13DA3ED600E05434 /* AudioMeteringDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C55D13DA3ED500E05434 /* AudioMeteringDemo.cpp */; };
-		C1F0C61C13DA3ED600E05434 /* AudioMeteringDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C55E13DA3ED500E05434 /* AudioMeteringDemo.h */; };
-		C1F0C61D13DA3ED600E05434 /* AudioTaperDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C55F13DA3ED500E05434 /* AudioTaperDemo.cpp */; };
-		C1F0C61E13DA3ED600E05434 /* AudioTaperDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56013DA3ED500E05434 /* AudioTaperDemo.h */; };
-		C1F0C61F13DA3ED600E05434 /* BalanceAndPanDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56113DA3ED500E05434 /* BalanceAndPanDemo.cpp */; };
-		C1F0C62013DA3ED600E05434 /* BalanceAndPanDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56213DA3ED500E05434 /* BalanceAndPanDemo.h */; };
-		C1F0C62113DA3ED600E05434 /* BitmapFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56313DA3ED500E05434 /* BitmapFont.cpp */; };
-		C1F0C62213DA3ED600E05434 /* BitmapFont.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56413DA3ED500E05434 /* BitmapFont.h */; };
-		C1F0C62313DA3ED600E05434 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56513DA3ED500E05434 /* Camera.cpp */; };
-		C1F0C62413DA3ED600E05434 /* Camera.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56613DA3ED500E05434 /* Camera.h */; };
-		C1F0C62513DA3ED600E05434 /* ComplexSoundsDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56713DA3ED500E05434 /* ComplexSoundsDemo.cpp */; };
-		C1F0C62613DA3ED600E05434 /* ComplexSoundsDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56813DA3ED500E05434 /* ComplexSoundsDemo.h */; };
-		C1F0C62713DA3ED600E05434 /* ConeAttenuationDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56913DA3ED500E05434 /* ConeAttenuationDemo.cpp */; };
-		C1F0C62813DA3ED600E05434 /* ConeAttenuationDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56A13DA3ED500E05434 /* ConeAttenuationDemo.h */; };
-		C1F0C62913DA3ED600E05434 /* DemoBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56B13DA3ED500E05434 /* DemoBase.cpp */; };
-		C1F0C62A13DA3ED600E05434 /* DemoBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56C13DA3ED500E05434 /* DemoBase.h */; };
-		C1F0C62B13DA3ED600E05434 /* DistanceAttenuationDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56D13DA3ED500E05434 /* DistanceAttenuationDemo.cpp */; };
-		C1F0C62C13DA3ED600E05434 /* DistanceAttenuationDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C56E13DA3ED500E05434 /* DistanceAttenuationDemo.h */; };
-		C1F0C62D13DA3ED600E05434 /* DopplerShiftDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C56F13DA3ED500E05434 /* DopplerShiftDemo.cpp */; };
-		C1F0C62E13DA3ED600E05434 /* DopplerShiftDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57013DA3ED500E05434 /* DopplerShiftDemo.h */; };
-		C1F0C62F13DA3ED600E05434 /* DSPDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57113DA3ED500E05434 /* DSPDemo.cpp */; };
-		C1F0C63013DA3ED600E05434 /* DSPDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57213DA3ED500E05434 /* DSPDemo.h */; };
-		C1F0C63113DA3ED600E05434 /* EmitterSwarmDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57313DA3ED500E05434 /* EmitterSwarmDemo.cpp */; };
-		C1F0C63213DA3ED600E05434 /* EmitterSwarmDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57413DA3ED500E05434 /* EmitterSwarmDemo.h */; };
-		C1F0C63513DA3ED600E05434 /* fileutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57713DA3ED500E05434 /* fileutil.h */; };
-		C1F0C63613DA3ED600E05434 /* FreeformEventsDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57813DA3ED500E05434 /* FreeformEventsDemo.cpp */; };
-		C1F0C63713DA3ED600E05434 /* FreeformEventsDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57913DA3ED500E05434 /* FreeformEventsDemo.h */; };
-		C1F0C63813DA3ED600E05434 /* InputDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57A13DA3ED500E05434 /* InputDemo.cpp */; };
-		C1F0C63913DA3ED600E05434 /* InputDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57B13DA3ED500E05434 /* InputDemo.h */; };
-		C1F0C63A13DA3ED600E05434 /* KowalskiDemoManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57C13DA3ED500E05434 /* KowalskiDemoManager.cpp */; };
-		C1F0C63B13DA3ED600E05434 /* KowalskiDemoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C57D13DA3ED500E05434 /* KowalskiDemoManager.h */; };
-		C1F0C63C13DA3ED600E05434 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57E13DA3ED500E05434 /* main.cpp */; };
-		C1F0C63D13DA3ED600E05434 /* MeterBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C57F13DA3ED500E05434 /* MeterBar.cpp */; };
-		C1F0C63E13DA3ED600E05434 /* MeterBar.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58013DA3ED500E05434 /* MeterBar.h */; };
-		C1F0C63F13DA3ED600E05434 /* MixPresetDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58113DA3ED600E05434 /* MixPresetDemo.cpp */; };
-		C1F0C64013DA3ED600E05434 /* MixPresetDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58213DA3ED600E05434 /* MixPresetDemo.h */; };
-		C1F0C64113DA3ED600E05434 /* PianoDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58313DA3ED600E05434 /* PianoDemo.cpp */; };
-		C1F0C64213DA3ED600E05434 /* PianoDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58413DA3ED600E05434 /* PianoDemo.h */; };
-		C1F0C64313DA3ED600E05434 /* PositionalAudioDemoBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58513DA3ED600E05434 /* PositionalAudioDemoBase.cpp */; };
-		C1F0C64413DA3ED600E05434 /* PositionalAudioDemoBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58613DA3ED600E05434 /* PositionalAudioDemoBase.h */; };
-		C1F0C64513DA3ED600E05434 /* SafeWaveBankUnloadingDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58713DA3ED600E05434 /* SafeWaveBankUnloadingDemo.cpp */; };
-		C1F0C64613DA3ED600E05434 /* SafeWaveBankUnloadingDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58813DA3ED600E05434 /* SafeWaveBankUnloadingDemo.h */; };
-		C1F0C64713DA3ED600E05434 /* SampleClockDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58913DA3ED600E05434 /* SampleClockDemo.cpp */; };
-		C1F0C64813DA3ED600E05434 /* SampleClockDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58A13DA3ED600E05434 /* SampleClockDemo.h */; };
-		C1F0C64913DA3ED600E05434 /* SeamlessPitchDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58B13DA3ED600E05434 /* SeamlessPitchDemo.cpp */; };
-		C1F0C64A13DA3ED600E05434 /* SeamlessPitchDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58C13DA3ED600E05434 /* SeamlessPitchDemo.h */; };
-		C1F0C64B13DA3ED600E05434 /* SoundEmitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C58D13DA3ED600E05434 /* SoundEmitter.cpp */; };
-		C1F0C64C13DA3ED600E05434 /* SoundEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C58E13DA3ED600E05434 /* SoundEmitter.h */; };
-		C1F0C64D13DA3ED600E05434 /* fileutil.mm in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C59013DA3ED600E05434 /* fileutil.mm */; };
-		C1F0C64E13DA3ED600E05434 /* SDLMain.h in Headers */ = {isa = PBXBuildFile; fileRef = C1F0C59113DA3ED600E05434 /* SDLMain.h */; };
-		C1F0C64F13DA3ED600E05434 /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C59213DA3ED600E05434 /* SDLMain.m */; };
-		C1F0C65013DA3ED600E05434 /* fileutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1F0C59413DA3ED600E05434 /* fileutil.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -974,37 +992,51 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C1A018C51265EF120039DB22 /* kwl_eventdefinition.h in Headers */,
-				C1A77324126C647C00B6B1C4 /* kwl_audiofileutil.h in Headers */,
-				C1CDEF11127AD8090054F870 /* kwl_asm.h in Headers */,
-				C136324313851FA9002CD5C2 /* kwl_dspunit.h in Headers */,
-				C1F0C61C13DA3ED600E05434 /* AudioMeteringDemo.h in Headers */,
-				C1F0C61E13DA3ED600E05434 /* AudioTaperDemo.h in Headers */,
-				C1F0C62013DA3ED600E05434 /* BalanceAndPanDemo.h in Headers */,
-				C1F0C62213DA3ED600E05434 /* BitmapFont.h in Headers */,
-				C1F0C62413DA3ED600E05434 /* Camera.h in Headers */,
-				C1F0C62613DA3ED600E05434 /* ComplexSoundsDemo.h in Headers */,
-				C1F0C62813DA3ED600E05434 /* ConeAttenuationDemo.h in Headers */,
-				C1F0C62A13DA3ED600E05434 /* DemoBase.h in Headers */,
-				C1F0C62C13DA3ED600E05434 /* DistanceAttenuationDemo.h in Headers */,
-				C1F0C62E13DA3ED600E05434 /* DopplerShiftDemo.h in Headers */,
-				C1F0C63013DA3ED600E05434 /* DSPDemo.h in Headers */,
-				C1F0C63213DA3ED600E05434 /* EmitterSwarmDemo.h in Headers */,
-				C1F0C63513DA3ED600E05434 /* fileutil.h in Headers */,
-				C1F0C63713DA3ED600E05434 /* FreeformEventsDemo.h in Headers */,
-				C1F0C63913DA3ED600E05434 /* InputDemo.h in Headers */,
-				C1F0C63B13DA3ED600E05434 /* KowalskiDemoManager.h in Headers */,
-				C1F0C63E13DA3ED600E05434 /* MeterBar.h in Headers */,
-				C1F0C64013DA3ED600E05434 /* MixPresetDemo.h in Headers */,
-				C1F0C64213DA3ED600E05434 /* PianoDemo.h in Headers */,
-				C1F0C64413DA3ED600E05434 /* PositionalAudioDemoBase.h in Headers */,
-				C1F0C64613DA3ED600E05434 /* SafeWaveBankUnloadingDemo.h in Headers */,
-				C1F0C64813DA3ED600E05434 /* SampleClockDemo.h in Headers */,
-				C1F0C64A13DA3ED600E05434 /* SeamlessPitchDemo.h in Headers */,
-				C1F0C64C13DA3ED600E05434 /* SoundEmitter.h in Headers */,
-				C1F0C64E13DA3ED600E05434 /* SDLMain.h in Headers */,
-				C19FD684141AC72900B836F5 /* kwl_decoder_pcm.h in Headers */,
-				C1702E591461645B00ADE4F7 /* kwl_enginedata.h in Headers */,
+				C1AEFFED1472B80300AFC66F /* asm_arm.h in Headers */,
+				C1AEFFEF1472B80300AFC66F /* backends.h in Headers */,
+				C1AEFFF11472B80300AFC66F /* tremor_block.h in Headers */,
+				C1AEFFF31472B80300AFC66F /* codebook.h in Headers */,
+				C1AEFFF41472B80300AFC66F /* codec_internal.h in Headers */,
+				C1AEFFF51472B80300AFC66F /* config_types.h in Headers */,
+				C1AEFFF61472B80300AFC66F /* config.h in Headers */,
+				C1AEFFFB1472B80300AFC66F /* ivorbiscodec.h in Headers */,
+				C1AEFFFC1472B80300AFC66F /* ivorbisfile.h in Headers */,
+				C1AEFFFD1472B80300AFC66F /* lsp_lookup.h in Headers */,
+				C1AEFFFF1472B80300AFC66F /* mdct_lookup.h in Headers */,
+				C1AE00011472B80300AFC66F /* mdct.h in Headers */,
+				C1AE00021472B80300AFC66F /* misc.h in Headers */,
+				C1AE00031472B80300AFC66F /* ogg.h in Headers */,
+				C1AE00041472B80300AFC66F /* os_types.h in Headers */,
+				C1AE00051472B80300AFC66F /* os.h in Headers */,
+				C1AE00071472B80300AFC66F /* registry.h in Headers */,
+				C1AE000C1472B80300AFC66F /* window_lookup.h in Headers */,
+				C1AE000E1472B80300AFC66F /* window.h in Headers */,
+				C1AEFFA91472B68500AFC66F /* kowalski.h in Headers */,
+				C1AEFFAB1472B68500AFC66F /* kowalski_ext.h in Headers */,
+				C1AEFFAC1472B68500AFC66F /* kwl_asm.h in Headers */,
+				C1AEFFAD1472B68500AFC66F /* kwl_assert.h in Headers */,
+				C1AEFFAE1472B68500AFC66F /* kwl_audiodata.h in Headers */,
+				C1AEFFB01472B68500AFC66F /* kwl_audiofileutil.h in Headers */,
+				C1AEFFB21472B68500AFC66F /* kwl_decoder.h in Headers */,
+				C1AEFFB41472B68500AFC66F /* kwl_decoder_imaadpcm.h in Headers */,
+				C1AEFFB61472B68500AFC66F /* kwl_decoder_oggvorbis.h in Headers */,
+				C1AEFFB81472B68500AFC66F /* kwl_decoder_pcm.h in Headers */,
+				C1AEFFBA1472B68500AFC66F /* kwl_dspunit.h in Headers */,
+				C1AEFFBB1472B68500AFC66F /* kwl_enginedata.h in Headers */,
+				C1AEFFBE1472B68500AFC66F /* kwl_event.h in Headers */,
+				C1AEFFBF1472B68500AFC66F /* kwl_eventdefinition.h in Headers */,
+				C1AEFFC21472B68500AFC66F /* kwl_inputstream.h in Headers */,
+				C1AEFFC41472B68500AFC66F /* kwl_memory.h in Headers */,
+				C1AEFFC51472B68500AFC66F /* kwl_messagequeue.h in Headers */,
+				C1AEFFC81472B68500AFC66F /* kwl_mixbus.h in Headers */,
+				C1AEFFC91472B68500AFC66F /* kwl_mixpreset.h in Headers */,
+				C1AEFFCA1472B68500AFC66F /* kwl_positionalaudiolistener.h in Headers */,
+				C1AEFFCC1472B68500AFC66F /* kwl_positionalaudiosettings.h in Headers */,
+				C1AEFFCF1472B68500AFC66F /* kwl_softwaremixer.h in Headers */,
+				C1AEFFD11472B68500AFC66F /* kwl_sound.h in Headers */,
+				C1AEFFD31472B68500AFC66F /* kwl_soundengine.h in Headers */,
+				C1AEFFD41472B68500AFC66F /* kwl_synchronization.h in Headers */,
+				C1AEFFD71472B68500AFC66F /* kwl_wavebank.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1300,39 +1332,43 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C1A018C61265EF120039DB22 /* kwl_eventdefinition.c in Sources */,
-				C1A77325126C647C00B6B1C4 /* kwl_audiofileutil.c in Sources */,
-				C192DBB11274391100852CBC /* kwl_audiodata.c in Sources */,
-				C1F0C61B13DA3ED600E05434 /* AudioMeteringDemo.cpp in Sources */,
-				C1F0C61D13DA3ED600E05434 /* AudioTaperDemo.cpp in Sources */,
-				C1F0C61F13DA3ED600E05434 /* BalanceAndPanDemo.cpp in Sources */,
-				C1F0C62113DA3ED600E05434 /* BitmapFont.cpp in Sources */,
-				C1F0C62313DA3ED600E05434 /* Camera.cpp in Sources */,
-				C1F0C62513DA3ED600E05434 /* ComplexSoundsDemo.cpp in Sources */,
-				C1F0C62713DA3ED600E05434 /* ConeAttenuationDemo.cpp in Sources */,
-				C1F0C62913DA3ED600E05434 /* DemoBase.cpp in Sources */,
-				C1F0C62B13DA3ED600E05434 /* DistanceAttenuationDemo.cpp in Sources */,
-				C1F0C62D13DA3ED600E05434 /* DopplerShiftDemo.cpp in Sources */,
-				C1F0C62F13DA3ED600E05434 /* DSPDemo.cpp in Sources */,
-				C1F0C63113DA3ED600E05434 /* EmitterSwarmDemo.cpp in Sources */,
-				C1F0C63613DA3ED600E05434 /* FreeformEventsDemo.cpp in Sources */,
-				C1F0C63813DA3ED600E05434 /* InputDemo.cpp in Sources */,
-				C1F0C63A13DA3ED600E05434 /* KowalskiDemoManager.cpp in Sources */,
-				C1F0C63C13DA3ED600E05434 /* main.cpp in Sources */,
-				C1F0C63D13DA3ED600E05434 /* MeterBar.cpp in Sources */,
-				C1F0C63F13DA3ED600E05434 /* MixPresetDemo.cpp in Sources */,
-				C1F0C64113DA3ED600E05434 /* PianoDemo.cpp in Sources */,
-				C1F0C64313DA3ED600E05434 /* PositionalAudioDemoBase.cpp in Sources */,
-				C1F0C64513DA3ED600E05434 /* SafeWaveBankUnloadingDemo.cpp in Sources */,
-				C1F0C64713DA3ED600E05434 /* SampleClockDemo.cpp in Sources */,
-				C1F0C64913DA3ED600E05434 /* SeamlessPitchDemo.cpp in Sources */,
-				C1F0C64B13DA3ED600E05434 /* SoundEmitter.cpp in Sources */,
-				C1F0C64D13DA3ED600E05434 /* fileutil.mm in Sources */,
-				C1F0C64F13DA3ED600E05434 /* SDLMain.m in Sources */,
-				C1F0C65013DA3ED600E05434 /* fileutil.cpp in Sources */,
-				C19FD685141AC72900B836F5 /* kwl_decoder_pcm.c in Sources */,
-				C166D354146072F700FB60DD /* kwl_wavebank.c in Sources */,
-				C1702E5A1461645B00ADE4F7 /* kwl_enginedata.c in Sources */,
+				C1AEFFEE1472B80300AFC66F /* bitwise.c in Sources */,
+				C1AEFFF01472B80300AFC66F /* block.c in Sources */,
+				C1AEFFF21472B80300AFC66F /* codebook.c in Sources */,
+				C1AEFFF71472B80300AFC66F /* floor0.c in Sources */,
+				C1AEFFF81472B80300AFC66F /* floor1.c in Sources */,
+				C1AEFFF91472B80300AFC66F /* framing.c in Sources */,
+				C1AEFFFA1472B80300AFC66F /* info.c in Sources */,
+				C1AEFFFE1472B80300AFC66F /* mapping0.c in Sources */,
+				C1AE00001472B80300AFC66F /* mdct.c in Sources */,
+				C1AE00061472B80300AFC66F /* registry.c in Sources */,
+				C1AE00081472B80300AFC66F /* res012.c in Sources */,
+				C1AE00091472B80300AFC66F /* sharedbook.c in Sources */,
+				C1AE000A1472B80300AFC66F /* synthesis.c in Sources */,
+				C1AE000B1472B80300AFC66F /* vorbisfile.c in Sources */,
+				C1AE000D1472B80300AFC66F /* window.c in Sources */,
+				C1AEFFAA1472B68500AFC66F /* kowalski.c in Sources */,
+				C1AEFFAF1472B68500AFC66F /* kwl_audiodata.c in Sources */,
+				C1AEFFB11472B68500AFC66F /* kwl_audiofileutil.c in Sources */,
+				C1AEFFB31472B68500AFC66F /* kwl_decoder.c in Sources */,
+				C1AEFFB51472B68500AFC66F /* kwl_decoder_imaadpcm.c in Sources */,
+				C1AEFFB71472B68500AFC66F /* kwl_decoder_oggvorbis.c in Sources */,
+				C1AEFFB91472B68500AFC66F /* kwl_decoder_pcm.c in Sources */,
+				C1AEFFBC1472B68500AFC66F /* kwl_enginedata.c in Sources */,
+				C1AEFFBD1472B68500AFC66F /* kwl_event.c in Sources */,
+				C1AEFFC01472B68500AFC66F /* kwl_eventdefinition.c in Sources */,
+				C1AEFFC11472B68500AFC66F /* kwl_inputstream.c in Sources */,
+				C1AEFFC31472B68500AFC66F /* kwl_memory.c in Sources */,
+				C1AEFFC61472B68500AFC66F /* kwl_messagequeue.c in Sources */,
+				C1AEFFC71472B68500AFC66F /* kwl_mixbus.c in Sources */,
+				C1AEFFCB1472B68500AFC66F /* kwl_positionalaudiolistener.c in Sources */,
+				C1AEFFCD1472B68500AFC66F /* kwl_positionalaudiosettings.c in Sources */,
+				C1AEFFCE1472B68500AFC66F /* kwl_softwaremixer.c in Sources */,
+				C1AEFFD01472B68500AFC66F /* kwl_sound.c in Sources */,
+				C1AEFFD21472B68500AFC66F /* kwl_soundengine.c in Sources */,
+				C1AEFFD51472B68500AFC66F /* kwl_synchronization_pthread.c in Sources */,
+				C1AEFFD81472B68500AFC66F /* kwl_wavebank.c in Sources */,
+				C1AEFFEC1472B7E000AFC66F /* kwl_soundengine_sdl.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

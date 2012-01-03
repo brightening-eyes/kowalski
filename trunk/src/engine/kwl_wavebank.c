@@ -84,6 +84,7 @@ kwlError kwlWaveBank_verifyWaveBankBinary(kwlSoundEngine* engine,
     else if (matchingWaveBank->isLoaded != 0)
     {
         /*The wave bank is already loaded, just set the handle and do nothing.*/
+        *waveBank = matchingWaveBank;
         kwlInputStream_close(&stream);
         return KWL_NO_ERROR;
     }
@@ -187,7 +188,7 @@ kwlError kwlWaveBank_loadAudioDataItems(kwlWaveBank* waveBank, kwlInputStream* s
                 break;
             }
         }
-        printf("    loading %s\n", waveEntryIdi);
+        //printf("    loading %s\n", waveEntryIdi);
         KWL_FREE(waveEntryIdi);
         
         const kwlAudioEncoding encoding = (kwlAudioEncoding)kwlInputStream_readIntBE(stream);

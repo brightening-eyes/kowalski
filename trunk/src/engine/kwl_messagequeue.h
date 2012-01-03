@@ -34,7 +34,11 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-static const int KWL_MESSAGE_QUEUE_SIZE = 500;
+/** 
+ * The size of the message queues used for sending messages
+ * between the engine and mixer threads.
+ */
+#define KWL_MESSAGE_QUEUE_SIZE 500
 
 /**
  * An enumeration of valid types for messages sent between the mixer and engine threads.
@@ -63,8 +67,6 @@ typedef enum
     KWL_FREEFORM_EVENT_STOP,
     /** Sent from the mixer to the engine, instructing it to unload a freeform event.*/
     KWL_UNLOAD_FREEFORM_EVENT,
-    /** Sent from the mixer to the engie thread to indicate that all events were successfully stopped.*/
-    KWL_ALL_EVENTS_STOPPED,
     /** Send from the engine to the mixer thread, requesting the mixer to stop all data driven event and mix buses.*/
     KWL_PREPARE_ENGINE_DATA_UNLOAD,
     /** Sent from the mixer to the engine thread indicating that it's safe to unload engine data.*/
@@ -106,9 +108,9 @@ typedef struct
  * @param The queue to initialize.
  */
 void kwlMessageQueue_init(kwlMessageQueue* queue);
-
-void kwlMessageQueue_clear(kwlMessageQueue* queue);
     
+void kwlMessageQueue_free(kwlMessageQueue* queue);
+
 /**
  * 
  * @param srcQueue 

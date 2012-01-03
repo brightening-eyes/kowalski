@@ -48,11 +48,14 @@ kwlError kwlEngineData_load(kwlEngineData* data, kwlInputStream* stream)
     }
     
     /*Load chunks*/
+    
     kwlEngineData_loadMixBusData(data, stream);
     kwlEngineData_loadMixPresetData(data, stream);
     kwlEngineData_loadWaveBankData(data, stream);
+    
     /*must happen after wave bank loading*/
     kwlEngineData_loadSoundData(data, stream);
+    
     /*must happen after sound, wave bank and mix bus loading.*/
     kwlEngineData_loadEventData(data, stream);
     
@@ -439,8 +442,8 @@ kwlError kwlEngineData_loadEventData(kwlEngineData* data, kwlInputStream* stream
         }
         
         /*read the event retrigger mode (ignored for streaming events)*/
-        definitioni->retriggerMode = (kwlEventRetriggerMode)kwlInputStream_readIntBE(stream); /*TODO: assert*/
-        KWL_ASSERT(definitioni->retriggerMode < 10 && definitioni->retriggerMode >= 0);
+        definitioni->retriggerMode = (kwlEventRetriggerMode)kwlInputStream_readIntBE(stream);
+        KWL_ASSERT(definitioni->retriggerMode <= 1 && definitioni->retriggerMode >= 0);
         
         /*read the index of the audio data referenced by this event (only used for streaming events)*/
         const int waveBankIndex = kwlInputStream_readIntBE(stream);

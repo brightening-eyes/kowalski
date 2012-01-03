@@ -204,7 +204,7 @@ kwlError kwlInitDecoderIPhone(kwlDecoder* decoder)
     /*
      * Create an audio buffer list to store decoded PCM samples in
      */
-    const int nFrames = 8300;
+    const int nFrames = 8300;//TODO: magic number
     kwlMemset(&data->bufferList, 0, sizeof(data->bufferList));
     AudioBuffer buffer = {0, 0, NULL};
     buffer.mNumberChannels = 2;

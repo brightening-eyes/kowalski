@@ -22,6 +22,7 @@ freely, subject to the following restrictions:
 */
 
 #include "kwl_asm.h"
+#include "kwl_audiofileutil.h"
 #include "kwl_event.h"
 #include "kwl_synchronization.h"
 #include "kwl_sound.h"
@@ -74,6 +75,159 @@ void kwlEvent_start(kwlEvent* event)
     event->prevEffectiveGain[0] = -1.0f;
     event->prevEffectiveGain[1] = -1.0f;
 }
+
+kwlError kwlEvent_createFreeformEventFromBuffer(kwlEvent** event, kwlPCMBuffer* buffer, kwlEventType type)
+{
+    if (buffer->numFrames < 1 ||
+        buffer->numChannels < 1 || 
+        buffer->numChannels > 2 ||
+        buffer->pcmData == NULL)
+    {
+        return KWL_INVALID_PARAMETER_VALUE;
+    }
+    
+    kwlAudioData* audioData = (kwlAudioData*)KWL_MALLOC(sizeof(kwlAudioData), 
+                                                        "freeform event audio data struct");
+    kwlMemset(audioData, 0, sizeof(kwlAudioData));
+    
+    audioData->numChannels = buffer->numChannels;
+    audioData->numFrames = buffer->numFrames;
+    audioData->numBytes = buffer->numFrames * buffer->numChannels * 2;/*2 bytes per 16 bit sample*/
+    audioData->bytes = buffer->pcmData;
+    audioData->encoding = KWL_ENCODING_SIGNED_16BIT_PCM;
+    
+    /*The id "freeform buffer event" is used later to indicate that the sample data should not be released.
+      This should really be handled in a better way.*/
+    return kwlEvent_createFreeformEventFromAudioData(event, audioData, type, "freeform buffer event");
+}
+
+kwlError kwlEvent_createFreeformEventFromFile(kwlEvent** event, const char* const audioFilePath, 
+                                              kwlEventType type, int streamFromDisk)
+{
+    
+    KWL_ASSERT(streamFromDisk == 0 && "stream flag not supported yet");
+    
+    /*try to load the audio file data*/
+    kwlAudioData* audioData = (kwlAudioData*)KWL_MALLOC(sizeof(kwlAudioData), 
+                                                        "freeform event audio data struct");
+    kwlMemset(audioData, 0, sizeof(kwlAudioData));
+    
+    kwlError error = kwlLoadAudioFile(audioFilePath, audioData, KWL_CONVERT_TO_INT16_OR_FAIL);
+    if (error != KWL_NO_ERROR)
+    {
+        KWL_FREE(audioData);
+        return error;
+    }
+    
+    if (type == KWL_POSITIONAL &&
+        audioData->numChannels != 1)
+    {
+        kwlAudioData_free(audioData);
+        KWL_FREE(audioData);
+        return KWL_POSITIONAL_EVENT_MUST_BE_MONO;
+    }
+    
+    return kwlEvent_createFreeformEventFromAudioData(event, audioData, type, "freeform event");
+}
+
+kwlError kwlEvent_createFreeformEventFromAudioData(kwlEvent** event, kwlAudioData* audioData, kwlEventType type, const char* eventId)
+{
+    /*create the event. as opposed to a data driven event, a freeform event does
+     not reference sounds and event definitions in the engine, but own its local data
+     that is freed when the event is released.*/
+    kwlEvent* createdEvent = (kwlEvent*)KWL_MALLOC(sizeof(kwlEvent), "freeform event instance");
+    kwlEvent_init(createdEvent);
+    
+    kwlSound* sound = NULL;
+    kwlAudioData* streamAudioData = NULL;
+    
+    /*create a sound if we loaded a PCM file.*/
+    if (audioData->encoding == KWL_ENCODING_SIGNED_16BIT_PCM)
+    {
+        sound = (kwlSound*)KWL_MALLOC(sizeof(kwlSound), "freeform event: sound");
+        kwlSound_init(sound);
+        sound->audioDataEntries = (kwlAudioData**)KWL_MALLOC(sizeof(kwlAudioData*), 
+                                                             "freeform event: sound audio data array list");
+        sound->audioDataEntries[0] = audioData;
+        sound->numAudioDataEntries = 1;
+        sound->playbackMode = KWL_SEQUENTIAL;
+        sound->playbackCount = 1;
+        sound->deferStop = 0;
+        sound->gain = 1.0f;
+        sound->pitch = 1.0f;
+        sound->pitchVariation = 0.0f;
+        sound->gainVariation = 0.0f;
+    }
+    else
+    {
+        KWL_ASSERT(0 && "TODO: support creating non-pcm events");
+    }
+    
+    /*create an event definition*/
+    kwlEventDefinition* eventDefinition = 
+    (kwlEventDefinition*)KWL_MALLOC(sizeof(kwlEventDefinition), 
+                                    "freeform event definition");
+    kwlEventDefinition_init(eventDefinition);
+    
+    eventDefinition->id = eventId;
+    eventDefinition->instanceCount = 1;
+    eventDefinition->isPositional = type == KWL_POSITIONAL ? 1 : 0;
+    eventDefinition->gain = 1.0f;
+    eventDefinition->pitch = 1.0f;
+    eventDefinition->innerConeCosAngle = 1.0f;
+    eventDefinition->outerConeCosAngle = -1.0f;
+    eventDefinition->outerConeGain = 1.0f;
+    eventDefinition->retriggerMode = KWL_RETRIGGER;
+    eventDefinition->stealingMode = KWL_DONT_STEAL;
+    eventDefinition->streamAudioData = streamAudioData;
+    eventDefinition->sound = sound;
+    eventDefinition->numReferencedWaveBanks = 0;
+    eventDefinition->referencedWaveBanks = NULL;
+    /*Set the mix bus to NULL. This is how the mixer knows this is a freeform event.
+     TODO: solve this in some better way?*/
+    eventDefinition->mixBus = NULL;
+    
+    createdEvent->definition_mixer = eventDefinition;
+    createdEvent->definition_engine = eventDefinition;
+    
+    *event = createdEvent;
+    
+    return KWL_NO_ERROR;
+}
+
+void kwlEvent_releaseFreeformEvent(kwlEvent* event)
+{
+    /*Free all data associated with the freeform event.*/
+    kwlEventDefinition* eventDefinition = event->definition_engine;
+    if (eventDefinition->streamAudioData != NULL)
+    {
+        KWL_ASSERT(0); /* double check this*/
+        kwlAudioData_free(eventDefinition->streamAudioData);
+        KWL_FREE(eventDefinition->streamAudioData);
+    }
+    else if (eventDefinition->sound != NULL)
+    {
+        /*TODO: this check could be more robust. it will cause a memory
+         leak for freeform events created from files with the name
+         "freeform buffer event"*/
+        if (strcmp(eventDefinition->id, "freeform buffer event") == 0)
+        {
+            /*don't release audio data buffer for freeform buffer events.*/
+            eventDefinition->sound->audioDataEntries[0]->bytes = NULL;
+        }
+        /* Free loaded audio data */
+        kwlAudioData_free(eventDefinition->sound->audioDataEntries[0]);
+        /* Free allocated audio data and sound structs */
+        KWL_FREE(eventDefinition->sound->audioDataEntries[0]);
+        KWL_FREE(eventDefinition->sound->audioDataEntries);
+        KWL_FREE(eventDefinition->sound);
+    }
+    
+    /* Finally, free the event instance and the event definition. */
+    KWL_FREE(eventDefinition);
+    KWL_FREE(event);
+}
+
 
 static int isUnitPitch(float pitch)
 {

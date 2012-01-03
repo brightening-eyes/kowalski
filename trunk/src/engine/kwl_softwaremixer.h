@@ -108,7 +108,7 @@ typedef struct kwlSoftwareMixer
     /** Non-zero if the mix bus hierarchy should be reset, zero otherwise.*/
     int resetMixBusesRequested;
     /** */
-    kwlMutexLock* mainMutexLock;
+    kwlMutexLock* mixerEngineMutexLock;
 } kwlSoftwareMixer;
 
 kwlSoftwareMixer* kwlSoftwareMixer_new();
