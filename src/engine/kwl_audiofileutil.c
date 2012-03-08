@@ -31,7 +31,7 @@ void* kwlAllocateBufferWithEntireStream(kwlInputStream* stream, int* fileSize)
     kwlInputStream_seek(stream, 0, SEEK_END);
     *fileSize = kwlInputStream_tell(stream);
     KWL_ASSERT(*fileSize > 0);
-    signed char* buffer = (signed char*)KWL_MALLOC(fileSize ,"entire file buffer");
+    signed char* buffer = (signed char*)KWL_MALLOC(*fileSize ,"entire file buffer");
     kwlInputStream_seek(stream, 0, SEEK_SET);
     int readBytes = kwlInputStream_read(stream, buffer, *fileSize);
     KWL_ASSERT(readBytes == *fileSize);
@@ -433,6 +433,8 @@ kwlError kwlLoadWAVFromStreamWithOptionalIMA4Params(kwlInputStream* stream,
                 else
                 {
                     audioData->encoding = sourceEncoding;
+                    audioData->numBytes = chunkSize;
+                    audioData->numFrames = 8 * chunkSize / (bitsPerSample * numChannels);
                 }
                 
             }
@@ -470,7 +472,7 @@ kwlError kwlLoadWAVFromStream(kwlInputStream* stream,
                               kwlAudioData* audioData, 
                               kwlAudioDataLoadingMode mode)
 {
-    kwlLoadWAVFromStreamWithOptionalIMA4Params(stream, audioData, mode, NULL, NULL, NULL);
+    return kwlLoadWAVFromStreamWithOptionalIMA4Params(stream, audioData, mode, NULL, NULL, NULL);
 }
 
 kwlError kwlLoadIMAADPCMWAVMetadataFromStream(kwlInputStream* stream, 
@@ -479,12 +481,12 @@ kwlError kwlLoadIMAADPCMWAVMetadataFromStream(kwlInputStream* stream,
                                               int* dataBlockSize,
                                               int* nBlockAlign)
 {
-    kwlLoadWAVFromStreamWithOptionalIMA4Params(stream, 
-                                                audioData, 
-                                                KWL_SKIP_AUDIO_DATA, 
-                                                firstDataBlockByte,
-                                                dataBlockSize,
-                                                nBlockAlign);
+    return kwlLoadWAVFromStreamWithOptionalIMA4Params(stream, 
+                                                      audioData, 
+                                                      KWL_SKIP_AUDIO_DATA, 
+                                                      firstDataBlockByte,
+                                                      dataBlockSize,
+                                                      nBlockAlign);
 }
 
 kwlError kwlLoadAU(const char* path, kwlAudioData* audioData, kwlAudioDataLoadingMode mode)

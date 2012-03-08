@@ -859,7 +859,7 @@ kwlDSPUnitHandle kwlDSPUnitCreateCustom(void* userdata,
     return newDSPUnit;
 }
 
-void kwlPCMBufferLoad(const char* const path, kwlPCMBuffer* buffer)
+kwlError kwlPCMBufferLoad(const char* const path, kwlPCMBuffer* buffer)
 {
     /** Reset input struct. */
     buffer->numFrames = 0;
@@ -873,13 +873,15 @@ void kwlPCMBufferLoad(const char* const path, kwlPCMBuffer* buffer)
     if (result != KWL_NO_ERROR)
     {
         kwlSetError(result);
-        return;
+        return result;
     }
     
     /** Copy all non-internal fields to the target struct.*/
     buffer->numFrames = audioData.numFrames;
     buffer->numChannels = audioData.numChannels;
     buffer->pcmData = (short*)audioData.bytes;
+    
+    return KWL_NO_ERROR;
 }
 
 void kwlPCMBufferFree(kwlPCMBuffer* buffer)
