@@ -220,7 +220,7 @@ void kwlPCMBufferFree(kwlPCMBuffer* buffer);
  * @param buffer A pointer to a kwlPCMBuffer struct to populate with audio data.
  * @see kwlPCMBufferFree
  */
-void kwlPCMBufferLoad(const char* const audioFilePath, kwlPCMBuffer* buffer);    
+kwlError kwlPCMBufferLoad(const char* const audioFilePath, kwlPCMBuffer* buffer);    
     
 /** @} */ /* End of audio file utilities block */
     
