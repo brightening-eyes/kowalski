@@ -98,7 +98,10 @@ void kwlSoftwareMixer_updateInput(kwlSoftwareMixer* mixer)
         kwlDSPUnit* dspUnit = (kwlDSPUnit*)mixer->inputDSPUnit.valueMixer;
         if (dspUnit != NULL)
         {
-            dspUnit->updateDSPMixerCallback(dspUnit->data);
+            if (dspUnit->updateDSPMixerCallback != NULL)
+            {
+                dspUnit->updateDSPMixerCallback(dspUnit->data);
+            }
         }
         
         kwlMutexLockRelease(mixer->mixerEngineMutexLock);
@@ -170,7 +173,10 @@ void kwlSoftwareMixer_updateOutput(kwlSoftwareMixer* const mixer)
         kwlDSPUnit* dspUnit = (kwlDSPUnit*)mixer->outputDSPUnit.valueMixer;
         if (dspUnit != NULL)
         {
-            dspUnit->updateDSPMixerCallback(dspUnit->data);
+            if (dspUnit->updateDSPMixerCallback != NULL)
+            {
+                dspUnit->updateDSPMixerCallback(dspUnit->data);
+            }
         }
         
         /*update levels and sync information*/
