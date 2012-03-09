@@ -1106,13 +1106,19 @@ kwlError kwlSoundEngine_update(kwlSoundEngine* engine, float timeStepSec)
     kwlDSPUnit* inputDspUnit = (kwlDSPUnit*)engine->mixer->inputDSPUnit.valueEngine;
     if (inputDspUnit != NULL)
     {
-        inputDspUnit->updateDSPEngineCallback(inputDspUnit->data);
+        if (inputDspUnit->updateDSPEngineCallback != NULL)
+        {
+            inputDspUnit->updateDSPEngineCallback(inputDspUnit->data);
+        }
     }
     
     kwlDSPUnit* outputDspUnit = (kwlDSPUnit*)engine->mixer->outputDSPUnit.valueEngine;
     if (outputDspUnit != NULL)
     {
-        outputDspUnit->updateDSPEngineCallback(outputDspUnit->data);
+        if (outputDspUnit->updateDSPEngineCallback != NULL)
+        {
+            outputDspUnit->updateDSPEngineCallback(outputDspUnit->data);
+        }
     }
     
     /*************************************************************************
