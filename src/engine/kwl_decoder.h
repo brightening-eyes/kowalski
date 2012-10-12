@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 
 #include "kowalski.h"
 #include "kwl_audiodata.h"
-#include "kwl_event.h"
+#include "kwl_eventinstance.h"
 #include "kwl_synchronization.h"
 
 #ifdef __cplusplus
@@ -80,13 +80,13 @@ typedef struct kwlDecoder
  * @param decoder
  * @param audioData
  */
-kwlError kwlDecoder_init(kwlDecoder* decoder, struct kwlEvent* event);
+kwlError kwlDecoder_init(kwlDecoder* decoder, struct kwlEventInstance* event);
     
 void kwlDecoder_deinit(kwlDecoder* decoder);
 
 void* kwlDecoder_decodingLoop(void*);
     
-int kwlDecoder_decodeNewBufferForEvent(kwlDecoder* decoder, struct kwlEvent* event);
+int kwlDecoder_decodeNewBufferForEvent(kwlDecoder* decoder, struct kwlEventInstance* event);
     
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -40,6 +40,20 @@ struct kwlEvent;
  */
 typedef struct kwlMixBus
 {
+    //engine->mixer
+    /** The total left channel gain, taking the parent buses into account*/
+    kwlSharedFloat totalGainLeft;
+    /** The total right channel gain, taking the parent buses into account*/
+    kwlSharedFloat totalGainRight;
+    /** The total pitch, taking the parent buses into account*/
+    kwlSharedFloat totalPitch;
+    /** The DSP unit, if any, that the output of this bus is fed through.*/
+    kwlSharedVoidPointer dspUnit;
+    
+    
+    
+    
+    
     /** The unique ID of this mix bus. */
     char* id;
     /** Non-zero if this is the master bus, zero otherwise.*/
@@ -50,9 +64,7 @@ typedef struct kwlMixBus
     /** The sub buses of this bus */
     struct kwlMixBus** subBuses;
     /** A linked list of currently playing events in this bus. */
-    struct kwlEvent* eventList;
-    /** The DSP unit, if any, that the output of this bus is fed through.*/
-    kwlSharedVoidPointer dspUnit;
+    struct kwlEventInstance* eventList;
     
     /** The left channel user gain */
     float userGainLeft;
@@ -68,26 +80,19 @@ typedef struct kwlMixBus
     /** The pitch computed by blending contributions from mix presets. */
     float mixPresetPitch;
     
-    /** The total left channel gain, taking the parent buses into account*/
-    kwlSharedFloat totalGainLeft;
-    /** The total right channel gain, taking the parent buses into account*/
-    kwlSharedFloat totalGainRight;
-    /** The total pitch, taking the parent buses into account*/
-    kwlSharedFloat totalPitch;
-    
 } kwlMixBus;
 
 /** */
 void kwlMixBus_init(kwlMixBus* mixBus);
 
 /** Adds an event to a mix bus. */
-void kwlMixBus_addEvent(kwlMixBus* bus, struct kwlEvent* event);
+void kwlMixBus_addEvent(kwlMixBus* bus, struct kwlEventInstance* event);
 
 /** Removes an event from a mix bus. */
-void kwlMixBus_removeEvent(kwlMixBus* bus, struct kwlEvent* event);
+void kwlMixBus_removeEvent(kwlMixBus* bus, struct kwlEventInstance* event);
 
 void kwlMixBus_render(kwlMixBus* mixBus, 
-                      void* mixer, //TODO: made this a void* to get things to compile. should be kwlSoftwareMixer*
+                      void* mixer, //TODO: made this a void* to get things to compile. should be kwlMixer*
                       int numOutChannels,
                       int numFrames, 
                       float* busScratchBuffer,

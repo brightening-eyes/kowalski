@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2010-2011 Per Gantelius
+ Copyright (c) 2010-2013 Per Gantelius
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -23,7 +23,7 @@
 
 #import "DemoViewController.h"
 
-const float timeStep = 0.01;
+const float timeStep = 0.02f;
 
 @implementation DemoViewController
 
@@ -32,12 +32,13 @@ const float timeStep = 0.01;
                            bundle:nil];
     
     demo = d;
-    
+
     //put the demo in a scroll view
-    CGRect frame = demo.frame;
-    UIScrollView* sw = [[UIScrollView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    sw.contentSize = CGSizeMake(frame.size.width, 
-                                frame.size.height);
+    CGRect demoFrame = demo.frame;
+    CGRect screenBounds = [UIScreen mainScreen].bounds;
+    UIScrollView* sw = [[UIScrollView alloc] initWithFrame:screenBounds];
+    sw.contentSize = CGSizeMake(demoFrame.size.width, 
+                                demoFrame.size.height);
     [sw addSubview:demo];
     
     self.view = sw;
@@ -56,6 +57,8 @@ const float timeStep = 0.01;
 -(void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
+    
+    //the same engine data is being used in all the demos for now
     kwlEngineDataLoad([DemoBase getResourcePath:@"demoproject.kwl"]);
     [demo initialize];
     kwlError error = kwlGetError();

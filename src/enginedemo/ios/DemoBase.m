@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2010-2011 Per Gantelius
+ Copyright (c) 2010-2013 Per Gantelius
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -45,7 +45,7 @@
 
 +(const char*)getResourcePath:(NSString*)fileName
 {
-    return [[[NSBundle mainBundle] pathForResource:fileName ofType:nil] cString];
+    return [[[NSBundle mainBundle] pathForResource:fileName ofType:nil] UTF8String];
 }
 
 @end

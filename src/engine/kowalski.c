@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -21,23 +21,23 @@ freely, subject to the following restrictions:
    distribution.
 */
 
-#include "kwl_event.h"
+#include "kwl_eventinstance.h"
 #include "kowalski.h"
 #include "kowalski_ext.h"
 #include "kwl_audiofileutil.h"
 #include "kwl_dspunit.h"
 #include "kwl_memory.h"
-#include "kwl_soundengine.h"
+#include "kwl_engine.h"
 
 #include "kwl_assert.h"
 #include <stdlib.h>
 #include <string.h>
 
-kwlSoundEngine* engine = NULL;
+kwlEngine* engine = NULL;
 
 kwlError error = KWL_NO_ERROR;
 
-void kwlSetError(kwlError err)
+static void kwlSetError(kwlError err)
 {
     if (err != KWL_NO_ERROR)
     {
@@ -50,7 +50,7 @@ void kwlSetError(kwlError err)
     }
 }
 
-kwlError kwlGetError()
+kwlError kwlGetError(void)
 {
     kwlError errorToReturn = error;
     error = KWL_NO_ERROR;
@@ -64,7 +64,7 @@ void kwlEventSetPitch(kwlEventHandle handle, float pitchInPercent)
         kwlSetError(KWL_ENGINE_IS_NOT_INITIALIZED);
         return;
     }
-    kwlSetError(kwlSoundEngine_eventSetPitch(engine, handle, pitchInPercent));
+    kwlSetError(kwlEngine_eventSetPitch(engine, handle, pitchInPercent));
 }
 
 void kwlEventSetGain(kwlEventHandle handle, float gain)
@@ -75,7 +75,7 @@ void kwlEventSetGain(kwlEventHandle handle, float gain)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetGain(engine, handle, gain, 0));
+    kwlSetError(kwlEngine_eventSetGain(engine, handle, gain, 0));
 }
 
 void kwlEventSetLinearGain(kwlEventHandle handle, float gain)
@@ -86,7 +86,7 @@ void kwlEventSetLinearGain(kwlEventHandle handle, float gain)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetGain(engine, handle, gain, 1));
+    kwlSetError(kwlEngine_eventSetGain(engine, handle, gain, 1));
 }
 
 
@@ -98,7 +98,7 @@ void kwlEventSetPosition(kwlEventHandle handle, float posX, float posY, float po
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetPosition(engine, handle, posX, posY, posZ));
+    kwlSetError(kwlEngine_eventSetPosition(engine, handle, posX, posY, posZ));
 }
 
 void kwlEventSetVelocity(kwlEventHandle handle, float velX, float velY, float velZ)
@@ -109,7 +109,7 @@ void kwlEventSetVelocity(kwlEventHandle handle, float velX, float velY, float ve
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetVelocity(engine, handle, velX, velY, velZ));
+    kwlSetError(kwlEngine_eventSetVelocity(engine, handle, velX, velY, velZ));
 }
 
 void kwlEventSetOrientation(kwlEventHandle handle, float directionX, float directionY, float directionZ)
@@ -120,7 +120,7 @@ void kwlEventSetOrientation(kwlEventHandle handle, float directionX, float direc
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetOrientation(engine, handle, directionX, directionY, directionZ));
+    kwlSetError(kwlEngine_eventSetOrientation(engine, handle, directionX, directionY, directionZ));
 }
 
 void kwlEventSetBalance(kwlEventHandle handle, float balance)
@@ -131,7 +131,7 @@ void kwlEventSetBalance(kwlEventHandle handle, float balance)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetBalance(engine, handle, balance));
+    kwlSetError(kwlEngine_eventSetBalance(engine, handle, balance));
 }
 
 kwlEventHandle kwlEventGetHandle(const char* const eventId)
@@ -143,7 +143,7 @@ kwlEventHandle kwlEventGetHandle(const char* const eventId)
     }
     
     kwlEventHandle handle = 0;
-    kwlSetError(kwlSoundEngine_eventGetHandle(engine, eventId, &handle));
+    kwlSetError(kwlEngine_eventGetHandle(engine, eventId, &handle));
     return handle;
 }
 
@@ -156,7 +156,7 @@ kwlEventDefinitionHandle kwlEventDefinitionGetHandle(const char* const eventDefi
     }
     
     kwlEventDefinitionHandle handle = 0;
-    kwlSetError(kwlSoundEngine_eventDefinitionGetHandle(engine, 
+    kwlSetError(kwlEngine_eventDefinitionGetHandle(engine, 
                                                         eventDefinitionID, 
                                                         &handle));
     return handle;
@@ -171,7 +171,7 @@ kwlEventHandle kwlEventCreateWithFile(const char* const audioFilePath, kwlEventT
     }
     
     kwlEventHandle handle = 0;
-    kwlSetError(kwlSoundEngine_eventCreateWithFile(engine, audioFilePath, &handle, eventType, streamFromDisk));
+    kwlSetError(kwlEngine_eventCreateWithFile(engine, audioFilePath, &handle, eventType, streamFromDisk));
     return handle;
 }
 
@@ -184,7 +184,7 @@ kwlEventHandle kwlEventCreateWithBuffer(kwlPCMBuffer* buffer, kwlEventType event
     }
     
     kwlEventHandle handle = 0;
-    kwlSetError(kwlSoundEngine_eventCreateWithBuffer(engine, buffer, &handle, eventType));
+    kwlSetError(kwlEngine_eventCreateWithBuffer(engine, buffer, &handle, eventType));
     return handle;
 }
 
@@ -196,7 +196,7 @@ void kwlEventRelease(kwlEventHandle handle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventRelease(engine, handle));
+    kwlSetError(kwlEngine_eventRelease(engine, handle));
 }
 
 void kwlEventStart(kwlEventHandle handle)
@@ -207,7 +207,7 @@ void kwlEventStart(kwlEventHandle handle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStart(engine, handle, 0));
+    kwlSetError(kwlEngine_eventStart(engine, handle, 0));
 }
 
 void kwlEventStartOneShot(kwlEventDefinitionHandle handle)
@@ -218,7 +218,7 @@ void kwlEventStartOneShot(kwlEventDefinitionHandle handle)
         return;
     }    
     
-    kwlSetError(kwlSoundEngine_eventStartOneShot(engine, handle, 0.0f, 0.0f, 0.0f, 0, NULL, NULL));
+    kwlSetError(kwlEngine_eventStartOneShot(engine, handle, 0.0f, 0.0f, 0.0f, 0, NULL, NULL));
 }
 
 void kwlEventStartOneShotAt(kwlEventDefinitionHandle handle, float x, float y, float z)
@@ -229,7 +229,7 @@ void kwlEventStartOneShotAt(kwlEventDefinitionHandle handle, float x, float y, f
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStartOneShot(engine, handle, x, y, z, 1, NULL, NULL));
+    kwlSetError(kwlEngine_eventStartOneShot(engine, handle, x, y, z, 1, NULL, NULL));
 }
 
 void kwlEventSetCallback(kwlEventHandle handle, kwlEventStoppedCallack callback, void* userData)
@@ -240,7 +240,7 @@ void kwlEventSetCallback(kwlEventHandle handle, kwlEventStoppedCallack callback,
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventSetStoppedCallback(engine, handle, callback, userData));
+    kwlSetError(kwlEngine_eventSetStoppedCallback(engine, handle, callback, userData));
     
 }
 
@@ -252,7 +252,7 @@ void kwlEventStartOneShotWithCallback(kwlEventDefinitionHandle eventDefinition, 
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStartOneShot(engine, eventDefinition, 0.0f, 0.0f, 0.0f, 0, callback, userData));
+    kwlSetError(kwlEngine_eventStartOneShot(engine, eventDefinition, 0.0f, 0.0f, 0.0f, 0, callback, userData));
 }
 
 void kwlEventStartOneShotWithCallbackAt(kwlEventDefinitionHandle eventDefinition, float x, float y, float z, kwlEventStoppedCallack callback, void* userData)
@@ -263,7 +263,7 @@ void kwlEventStartOneShotWithCallbackAt(kwlEventDefinitionHandle eventDefinition
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStartOneShot(engine, eventDefinition, x, y, z, 1, callback, userData));
+    kwlSetError(kwlEngine_eventStartOneShot(engine, eventDefinition, x, y, z, 1, callback, userData));
     
 }
 
@@ -275,7 +275,7 @@ void kwlEventStartFade(kwlEventHandle handle, float fadeTime)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStart(engine, handle, fadeTime));
+    kwlSetError(kwlEngine_eventStart(engine, handle, fadeTime));
 }
 
 void kwlEventStop(kwlEventHandle handle)
@@ -286,7 +286,7 @@ void kwlEventStop(kwlEventHandle handle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStop(engine, handle, 0));
+    kwlSetError(kwlEngine_eventStop(engine, handle, 0));
 }
 
 void kwlEventStopFade(kwlEventHandle handle, float fadeTime)
@@ -297,7 +297,7 @@ void kwlEventStopFade(kwlEventHandle handle, float fadeTime)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventStop(engine, handle, fadeTime));
+    kwlSetError(kwlEngine_eventStop(engine, handle, fadeTime));
 }
 
 void kwlEventPause(kwlEventHandle handle)
@@ -308,7 +308,7 @@ void kwlEventPause(kwlEventHandle handle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventPause(engine, handle));
+    kwlSetError(kwlEngine_eventPause(engine, handle));
 }
 
 void kwlEventResume(kwlEventHandle handle)
@@ -319,7 +319,7 @@ void kwlEventResume(kwlEventHandle handle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_eventResume(engine, handle));
+    kwlSetError(kwlEngine_eventResume(engine, handle));
 }
 
 int kwlEventIsPlaying(kwlEventHandle handle)
@@ -331,7 +331,7 @@ int kwlEventIsPlaying(kwlEventHandle handle)
     }
     
     int ret = 0;
-    kwlSetError(kwlSoundEngine_eventIsPlaying(engine, handle, &ret));
+    kwlSetError(kwlEngine_eventIsPlaying(engine, handle, &ret));
     return ret;
 }
 
@@ -347,7 +347,7 @@ kwlMixBusHandle kwlMixBusGetHandle(const char* const busId)
     }
     
     kwlMixBusHandle handle = 0;
-    kwlSetError(kwlSoundEngine_mixBusGetHandle(engine, busId, &handle));
+    kwlSetError(kwlEngine_mixBusGetHandle(engine, busId, &handle));
     return handle;
 }
 
@@ -359,7 +359,7 @@ void kwlMixBusSetGain(kwlMixBusHandle handle, float gain)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_mixBusSetGain(engine, handle, gain, 0));
+    kwlSetError(kwlEngine_mixBusSetGain(engine, handle, gain, 0));
 }
 
 void kwlMixBusSetLinearGain(kwlMixBusHandle handle, float gain)
@@ -370,7 +370,7 @@ void kwlMixBusSetLinearGain(kwlMixBusHandle handle, float gain)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_mixBusSetGain(engine, handle, gain, 1));
+    kwlSetError(kwlEngine_mixBusSetGain(engine, handle, gain, 1));
 }
 
 void kwlMixBusSetPitch(kwlMixBusHandle handle, float pitch)
@@ -381,7 +381,7 @@ void kwlMixBusSetPitch(kwlMixBusHandle handle, float pitch)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_mixBusSetPitch(engine, handle, pitch));
+    kwlSetError(kwlEngine_mixBusSetPitch(engine, handle, pitch));
 }
 
 
@@ -394,7 +394,7 @@ kwlMixPresetHandle kwlMixPresetGetHandle(const char* const presetId)
     }
     
     kwlMixPresetHandle handle = 0;
-    kwlSetError(kwlSoundEngine_mixPresetGetHandle(engine, presetId, &handle));
+    kwlSetError(kwlEngine_mixPresetGetHandle(engine, presetId, &handle));
     return handle;
 }
 
@@ -406,7 +406,7 @@ void kwlMixPresetFadeTo(kwlMixPresetHandle presetHandle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_mixPresetSetActive(engine, presetHandle, 1));
+    kwlSetError(kwlEngine_mixPresetSetActive(engine, presetHandle, 1));
 }
 
 void kwlMixPresetSet(kwlMixPresetHandle presetHandle)
@@ -417,7 +417,7 @@ void kwlMixPresetSet(kwlMixPresetHandle presetHandle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_mixPresetSetActive(engine, presetHandle, 0));
+    kwlSetError(kwlEngine_mixPresetSetActive(engine, presetHandle, 0));
 }
 
 void kwlListenerSetPosition(float posX, float posY, float posZ)
@@ -428,7 +428,7 @@ void kwlListenerSetPosition(float posX, float posY, float posZ)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setListenerPosition(engine, posX, posY, posZ));
+    kwlSetError(kwlEngine_setListenerPosition(engine, posX, posY, posZ));
 }
 
 void kwlListenerSetVelocity(float velX, float velY, float velZ)
@@ -439,7 +439,7 @@ void kwlListenerSetVelocity(float velX, float velY, float velZ)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setListenerVelocity(engine, velX, velY, velZ));
+    kwlSetError(kwlEngine_setListenerVelocity(engine, velX, velY, velZ));
 }
 
 void kwlListenerSetOrientation(float directionX, float directionY, float directionZ,
@@ -451,7 +451,7 @@ void kwlListenerSetOrientation(float directionX, float directionY, float directi
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setListenerOrientation(engine, 
+    kwlSetError(kwlEngine_setListenerOrientation(engine, 
                                                       directionX, directionY, directionZ,
                                                       upX, upY, upZ));
 }
@@ -468,7 +468,7 @@ void kwlSetDistanceAttenuationModel(kwlDistanceAttenuationModel type,
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setDistanceAttenuationModel(engine,
+    kwlSetError(kwlEngine_setDistanceAttenuationModel(engine,
                                                            type, 
                                                            clamp, 
                                                            maxDistance, 
@@ -484,7 +484,7 @@ void kwlSetDopplerShiftParameters(float speedOfSound, float dopplerScale)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setDopplerShiftParameters(engine, speedOfSound, dopplerScale));
+    kwlSetError(kwlEngine_setDopplerShiftParameters(engine, speedOfSound, dopplerScale));
 }
 
 void kwlSetConeAttenuationEnabled(int enableListenerCone, int enableEventCones)
@@ -495,7 +495,7 @@ void kwlSetConeAttenuationEnabled(int enableListenerCone, int enableEventCones)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setConeAttenuationEnabled(engine, enableListenerCone, enableEventCones));
+    kwlSetError(kwlEngine_setConeAttenuationEnabled(engine, enableListenerCone, enableEventCones));
 }
 
 void kwlListenerSetConeParameters(float innerConeAngle, float outerConeAngle, float outerConeGain)
@@ -506,10 +506,10 @@ void kwlListenerSetConeParameters(float innerConeAngle, float outerConeAngle, fl
         return;
     }
     
-    kwlSetError(kwlSoundEngine_setListenerConeParameters(engine, innerConeAngle, outerConeAngle, outerConeGain));
+    kwlSetError(kwlEngine_setListenerConeParameters(engine, innerConeAngle, outerConeAngle, outerConeGain));
 }
 
-void kwlMixerResume()
+void kwlMixerResume(void)
 {
     if (engine == NULL)
     {
@@ -517,10 +517,10 @@ void kwlMixerResume()
         return;
     }
     
-    kwlSetError(kwlSoundEngine_resume(engine));
+    kwlSetError(kwlEngine_resume(engine));
 }
 
-void kwlMixerPause()
+void kwlMixerPause(void)
 {
     if (engine == NULL)
     {
@@ -528,10 +528,10 @@ void kwlMixerPause()
         return;
     }
     
-    kwlSetError(kwlSoundEngine_pause(engine));
+    kwlSetError(kwlEngine_pause(engine));
 }
 
-float kwlGetLevelLeft()
+float kwlGetLevelLeft(void)
 {
     if (engine == NULL)
     {
@@ -541,11 +541,11 @@ float kwlGetLevelLeft()
     
     float levelLeft = 0.0f;
     float levelRight = 0.0f;
-    kwlSetError(kwlSoundEngine_getOutLevels(engine, &levelLeft, &levelRight));
+    kwlSetError(kwlEngine_getOutLevels(engine, &levelLeft, &levelRight));
     return levelLeft;
 }
 
-float kwlGetLevelRight()
+float kwlGetLevelRight(void)
 {
     if (engine == NULL)
     {
@@ -555,11 +555,11 @@ float kwlGetLevelRight()
     
     float levelLeft = 0.0f;
     float levelRight = 0.0f;
-    kwlSetError(kwlSoundEngine_getOutLevels(engine, &levelLeft, &levelRight));
+    kwlSetError(kwlEngine_getOutLevels(engine, &levelLeft, &levelRight));
     return levelRight;
 }
 
-int kwlHasClipped()
+int kwlHasClipped(void)
 {
     if (engine == NULL)
     {
@@ -568,7 +568,7 @@ int kwlHasClipped()
     }
     
     int hasClipped = 0;
-    kwlSetError(kwlSoundEngine_hasClipped(engine, &hasClipped));
+    kwlSetError(kwlEngine_hasClipped(engine, &hasClipped));
     return hasClipped;
 }
 
@@ -597,7 +597,7 @@ void kwlUpdate(float timeStepSec)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_update(engine, timeStepSec));
+    kwlSetError(kwlEngine_update(engine, timeStepSec));
 }
 
 kwlWaveBankHandle kwlWaveBankLoad(const char* const path)
@@ -608,7 +608,7 @@ kwlWaveBankHandle kwlWaveBankLoad(const char* const path)
         return KWL_INVALID_HANDLE;
     }
     kwlWaveBankHandle handle = 0;
-    kwlSetError(kwlSoundEngine_loadWaveBank(engine, path, &handle, 0, NULL));
+    kwlSetError(kwlEngine_loadWaveBank(engine, path, &handle, 0, NULL));
     return handle;
 }
 
@@ -617,10 +617,9 @@ void kwlWaveBankLoadWithCallback(const char* path, kwlWaveBankFinishedLoadingCal
     if (engine == NULL)
     {
         kwlSetError(KWL_ENGINE_IS_NOT_INITIALIZED);
-        return KWL_INVALID_HANDLE;
     }
     
-    kwlSetError(kwlSoundEngine_loadWaveBank(engine, path, NULL, 1, callback));
+    kwlSetError(kwlEngine_loadWaveBank(engine, path, NULL, 1, callback));
 }
 
 int kwlWaveBankIsLoaded(kwlWaveBankHandle handle)
@@ -632,7 +631,7 @@ int kwlWaveBankIsLoaded(kwlWaveBankHandle handle)
     }
     
     int isLoaded = 0;
-    kwlSetError(kwlSoundEngine_waveBankIsLoaded(engine, handle, &isLoaded));
+    kwlSetError(kwlEngine_waveBankIsLoaded(engine, handle, &isLoaded));
     return isLoaded;
 }
 
@@ -645,7 +644,7 @@ int kwlWaveBankIsReferencedByPlayingEvent(kwlWaveBankHandle handle)
     }
     
     int isReferenced = 0;
-    kwlSetError(kwlSoundEngine_waveBankIsReferencedByPlayingEvent(engine, handle, &isReferenced));
+    kwlSetError(kwlEngine_waveBankIsReferencedByPlayingEvent(engine, handle, &isReferenced));
     return isReferenced;
 }
 
@@ -656,7 +655,7 @@ void kwlWaveBankUnload(kwlWaveBankHandle waveBankHandle)
         kwlSetError(KWL_ENGINE_IS_NOT_INITIALIZED);
         return;
     }
-    kwlSetError(kwlSoundEngine_requestUnloadWaveBank(engine, waveBankHandle, 0));
+    kwlSetError(kwlEngine_requestUnloadWaveBank(engine, waveBankHandle, 0));
 }
 
 void kwlWaveBankUnloadBlocking(kwlWaveBankHandle waveBankHandle)
@@ -666,7 +665,7 @@ void kwlWaveBankUnloadBlocking(kwlWaveBankHandle waveBankHandle)
         kwlSetError(KWL_ENGINE_IS_NOT_INITIALIZED);
         return;
     }
-    kwlSetError(kwlSoundEngine_requestUnloadWaveBank(engine, waveBankHandle, 1));
+    kwlSetError(kwlEngine_requestUnloadWaveBank(engine, waveBankHandle, 1));
 }
 
 unsigned int kwlGetNumFramesMixed()
@@ -678,7 +677,7 @@ unsigned int kwlGetNumFramesMixed()
     }
     
     unsigned int numFramesMixed = 0;
-    kwlSetError(kwlSoundEngine_getNumFramesMixed(engine, &numFramesMixed));
+    kwlSetError(kwlEngine_getNumFramesMixed(engine, &numFramesMixed));
     return numFramesMixed;
 }
 
@@ -715,12 +714,12 @@ void kwlInitialize(int sampleRate, int numOutputChannels, int numInputChannels, 
     }
 
     /*create the sound engine instance*/
-    engine = (kwlSoundEngine*)KWL_MALLOC((sizeof(kwlSoundEngine)), "kwlInitialize");
-    kwlMemset(engine, 0, sizeof(kwlSoundEngine));
-    kwlSoundEngine_init(engine);
+    engine = (kwlEngine*)KWL_MALLOC((sizeof(kwlEngine)), "kwlInitialize");
+    kwlMemset(engine, 0, sizeof(kwlEngine));
+    kwlEngine_init(engine);
     
     /*and initialise it*/
-    kwlSetError(kwlSoundEngine_initialize(engine, sampleRate, numOutputChannels, numInputChannels, bufferSize));
+    kwlSetError(kwlEngine_initialize(engine, sampleRate, numOutputChannels, numInputChannels, bufferSize));
 }
 
 /** */
@@ -732,7 +731,7 @@ void kwlEngineDataLoad(const char* const dataPath)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_engineDataLoad(engine, dataPath));
+    kwlSetError(kwlEngine_engineDataLoad(engine, dataPath));
 }
 
 /** */
@@ -744,7 +743,7 @@ void kwlEngineDataUnload()
         return;
     }
     
-    kwlSetError(kwlSoundEngine_unloadEngineDataBlocking(engine));
+    kwlSetError(kwlEngine_unloadEngineDataBlocking(engine));
 }
 
 /** */
@@ -757,7 +756,7 @@ int kwlEngineDataIsLoaded()
     }
     
     int ret = 0;
-    kwlSetError(kwlSoundEngine_isLoaded(engine, &ret));
+    kwlSetError(kwlEngine_isLoaded(engine, &ret));
     return ret;
 }
 
@@ -771,9 +770,9 @@ void kwlDeinitialize()
     }
     
     /*shut down the sound engine*/
-    kwlSoundEngine_deinitialize(engine);
+    kwlEngine_deinitialize(engine);
     /*delete the sound engine instance*/
-    kwlSoundEngine_free(engine);
+    kwlEngine_free(engine);
     engine = NULL;
 }
 
@@ -786,7 +785,7 @@ void kwlDSPUnitAttachToEvent(kwlDSPUnit* dspUnit, kwlEventHandle eventHandle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_attachDSPUnitToEvent(engine, eventHandle, dspUnit));
+    kwlSetError(kwlEngine_attachDSPUnitToEvent(engine, eventHandle, dspUnit));
 }
 
 
@@ -798,7 +797,7 @@ void kwlDSPUnitAttachToMixBus(kwlDSPUnit* dspUnit, kwlMixBusHandle mixBusHandle)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_attachDSPUnitToMixBus(engine, mixBusHandle, dspUnit));
+    kwlSetError(kwlEngine_attachDSPUnitToMixBus(engine, mixBusHandle, dspUnit));
 }
 
 void kwlDSPUnitAttachToInput(kwlDSPUnit* dspUnit)
@@ -809,7 +808,7 @@ void kwlDSPUnitAttachToInput(kwlDSPUnit* dspUnit)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_attachDSPUnitToInput(engine, dspUnit));
+    kwlSetError(kwlEngine_attachDSPUnitToInput(engine, dspUnit));
 }
 
 void kwlDSPUnitAttachToOutput(kwlDSPUnit* dspUnit)
@@ -820,7 +819,7 @@ void kwlDSPUnitAttachToOutput(kwlDSPUnit* dspUnit)
         return;
     }
     
-    kwlSetError(kwlSoundEngine_attachDSPUnitToOutput(engine, dspUnit));
+    kwlSetError(kwlEngine_attachDSPUnitToOutput(engine, dspUnit));
 }
 
 int kwlIsInputEnabled()

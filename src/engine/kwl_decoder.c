@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -39,7 +39,7 @@ void kwlDecoder_swapBuffers(kwlDecoder* decoder)
     decoder->currentDecodedBuffer = temp;
 }
 
-kwlError kwlDecoder_init(kwlDecoder* decoder, kwlEvent* event)
+kwlError kwlDecoder_init(kwlDecoder* decoder, kwlEventInstance* event)
 {
     kwlAudioData* audioData = event->definition_engine->streamAudioData;
     /*reset the decoder struct.*/
@@ -207,7 +207,7 @@ void* kwlDecoder_decodingLoop(void* data)
     return NULL;
 }
 
-int kwlDecoder_decodeNewBufferForEvent(kwlDecoder* decoder, kwlEvent* event)
+int kwlDecoder_decodeNewBufferForEvent(kwlDecoder* decoder, kwlEventInstance* event)
 {
     if (decoder->isDecoding)
     {

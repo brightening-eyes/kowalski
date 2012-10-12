@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -35,7 +35,7 @@ extern "C"
     
 /**
  * An enumeration of audio encoding types. 
- * NOTE: These values must match the ones output by 
+ * NOTE: These values must match the values output by 
  * the wave bank builder.
  */
 typedef enum kwlAudioEncoding

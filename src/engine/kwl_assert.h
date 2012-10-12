@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,6 +33,7 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+/*Change this to something more advanced if need be.*/
 #define KWL_ASSERT(cond) assert(cond)
     
 #ifdef __cplusplus

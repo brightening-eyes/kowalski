@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 /*! \file */ 
 
 #include "kwl_audiodata.h"
-#include "kwl_event.h"
+#include "kwl_eventinstance.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -176,7 +176,7 @@ void kwlSound_init(kwlSound* sound);
  * Initializes a given event according to a sound definition.
  * @return Non-zero if the event should stop playing, zero otherwise.
  */
-int kwlSound_pickNextBufferForEvent(kwlSound* sound, struct kwlEvent* event, int firstBuffer);
+int kwlSound_pickNextBufferForEvent(kwlSound* sound, struct kwlEventInstance* event, int firstBuffer);
 
 
 #ifdef __cplusplus

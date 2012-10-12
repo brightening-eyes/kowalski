@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2010-2011 Per Gantelius
+ Copyright (c) 2010-2013 Per Gantelius
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -26,10 +26,10 @@
 #include "kwl_audiodata.h"
 #include "kwl_memory.h"
 #include "kwl_assert.h"
-#include "kwl_soundengine.h"
+#include "kwl_engine.h"
 #include "kwl_wavebank.h"
 
-kwlError kwlWaveBank_verifyWaveBankBinary(kwlSoundEngine* engine, 
+kwlError kwlWaveBank_verifyWaveBankBinary(kwlEngine* engine, 
                                           const char* const waveBankPath,
                                           kwlWaveBank** waveBank)
 {
@@ -229,7 +229,7 @@ kwlError kwlWaveBank_loadAudioDataItems(kwlWaveBank* waveBank, kwlInputStream* s
         if (streamFromDisk == 0)
         {
             /*This entry should not be streamed, so allocate audio data up front.*/
-            matchingAudioData->bytes = KWL_MALLOC(numBytes, "kwlSoundEngine_loadWaveBank");
+            matchingAudioData->bytes = KWL_MALLOC(numBytes, "kwlEngine_loadWaveBank");
             
             int bytesRead = kwlInputStream_read(stream, 
                                                 (signed char*)matchingAudioData->bytes, 
@@ -276,7 +276,7 @@ void kwlWaveBank_unload(kwlWaveBank* waveBank)
 {
     if (waveBank->isLoaded == 0)
     {
-        return KWL_NO_ERROR;
+        return;
     }
     
     /* Free all allocated audio data in the wave bank*/
