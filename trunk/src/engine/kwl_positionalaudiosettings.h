@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -62,7 +62,7 @@ typedef struct kwlPositionalAudioSettings
     int isEventConeAttenuationEnabled;
 } kwlPositionalAudioSettings;
 
-void kwlPositionalAudioSettings_init(kwlPositionalAudioSettings* settings);
+void kwlPositionalAudioSettings_setDefaults(kwlPositionalAudioSettings* settings);
     
 #ifdef __cplusplus
 }

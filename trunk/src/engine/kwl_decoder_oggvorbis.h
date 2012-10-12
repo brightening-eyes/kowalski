@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -36,7 +36,7 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-    
+//TODO: set properly
 static const int KWL_OGG_NUM_BUFFERED_FRAMES = 4096 << 5;
 
 /** 

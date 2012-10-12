@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2010-2011 Per Gantelius
+ Copyright (c) 2010-2013 Per Gantelius
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -66,7 +66,7 @@ static const char KWL_ENGINE_DATA_BINARY_FILE_IDENTIFIER[KWL_ENGINE_DATA_BINARY_
     
     
 /**
- * 
+ * A struct containing engine data loaded from a binary file.
  */
 typedef struct kwlEngineData
 {
@@ -100,7 +100,7 @@ typedef struct kwlEngineData
     /** An array of event definitions read from data. */
     struct kwlEventDefinition* eventDefinitions;
     /** An array of arrays of event instances read from data. Instance i of event definition j is at [j][i]. */
-    struct kwlEvent** events;
+    struct kwlEventInstance** events;
     
     /** The number of sound definitions currently loaded from engine data.*/
     int numSoundDefinitions;

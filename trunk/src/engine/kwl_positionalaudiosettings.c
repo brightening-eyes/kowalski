@@ -1,6 +1,6 @@
 #include "kwl_positionalaudiosettings.h"
 
-void kwlPositionalAudioSettings_init(kwlPositionalAudioSettings* settings)
+void kwlPositionalAudioSettings_setDefaults(kwlPositionalAudioSettings* settings)
 {
     //set defaults. TODO: choose these properly
     settings->dopplerScale = 1.0f;

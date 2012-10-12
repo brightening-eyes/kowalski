@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -22,7 +22,7 @@ freely, subject to the following restrictions:
 */
 
 #include "kwl_asm.h"
-#include "kwl_event.h"
+#include "kwl_eventinstance.h"
 #include "kwl_memory.h"
 #include "kwl_mixbus.h"
 #include "kwl_sound.h"
@@ -74,11 +74,11 @@ void kwlMixBus_dealloc(kwlMixBus* mixBus)
     KWL_FREE(mixBus);
 }
 
-void kwlMixBus_addEvent(kwlMixBus* bus, kwlEvent* event)
+void kwlMixBus_addEvent(kwlMixBus* bus, kwlEventInstance* event)
 {
     /*printf("adding event %d to bus %s\n", (int)event, bus->id);
       printf("    event list before:\n");
-    kwlEvent* tempEvent = bus->eventList;
+    kwlEventInstance* tempEvent = bus->eventList;
     while (tempEvent != NULL)
     {
         if (event == tempEvent)
@@ -91,7 +91,7 @@ void kwlMixBus_addEvent(kwlMixBus* bus, kwlEvent* event)
     
     KWL_ASSERT(event->nextEvent_mixer == NULL && "event to add already has event(s) attached to it");
         
-    kwlEvent* eventi = bus->eventList;
+    kwlEventInstance* eventi = bus->eventList;
     if (eventi == NULL)
     {
         /*The list is empty. Make the incoming event the first item.*/
@@ -118,10 +118,10 @@ void kwlMixBus_addEvent(kwlMixBus* bus, kwlEvent* event)
 
 }
 
-void kwlMixBus_removeEvent(kwlMixBus* bus, kwlEvent* event)
+void kwlMixBus_removeEvent(kwlMixBus* bus, kwlEventInstance* event)
 {
-    kwlEvent* prevEvent = NULL;
-    kwlEvent* eventi = bus->eventList;
+    kwlEventInstance* prevEvent = NULL;
+    kwlEventInstance* eventi = bus->eventList;
     
     while (eventi != event)
     {
@@ -141,7 +141,7 @@ void kwlMixBus_removeEvent(kwlMixBus* bus, kwlEvent* event)
     event->nextEvent_mixer = NULL;
     
     /*
-    kwlEvent* current
+    kwlEventInstance* current
     if (previousEvent)
     {
         previousEvent->nextEvent_mixer = event->nextEvent_mixer;
@@ -154,7 +154,7 @@ void kwlMixBus_removeEvent(kwlMixBus* bus, kwlEvent* event)
 
 
 void kwlMixBus_render(kwlMixBus* mixBus, 
-                      void* mixerVoid, //TODO: made this a void* to get things to compile. should be kwlSoftwareMixer*
+                      void* mixerVoid, //TODO: made this a void* to get things to compile. should be kwlMixer*
                       int numOutChannels,
                       int numFrames, 
                       float* busScratchBuffer,
@@ -164,7 +164,7 @@ void kwlMixBus_render(kwlMixBus* mixBus,
                       float accumulatedGainLeft,
                       float accumulatedGainRight)
 {
-    kwlSoftwareMixer* mixer = (kwlSoftwareMixer*)mixerVoid;
+    kwlMixer* mixer = (kwlMixer*)mixerVoid;
     const int numSubBuses = mixBus->numSubBuses;
     
     /* Render sub buses recursively. */
@@ -185,12 +185,12 @@ void kwlMixBus_render(kwlMixBus* mixBus,
     
     /* Mix the events of this bus into the out buffer. */
     kwlClearFloatBuffer(busScratchBuffer, numOutChannels * numFrames);
-    kwlEvent* event = mixBus->eventList;
+    kwlEventInstance* event = mixBus->eventList;
     int numEventsInBus = 0;    
     
     while (event != NULL)
     {
-        int eventFinishedPlaying = kwlEvent_render(event, 
+        int eventFinishedPlaying = kwlEventInstance_render(event, 
                                                    eventScratchBuffer, 
                                                    numOutChannels,
                                                    numFrames,
@@ -208,12 +208,12 @@ void kwlMixBus_render(kwlMixBus* mixBus,
           just stopped playing*/
         if (eventFinishedPlaying)
         {
-            kwlSoftwareMixer_sendEventStoppedMessage(mixer, event);
+            kwlMixer_sendEventStoppedMessage(mixer, event);
             /* Risky business: we're manipulating the linked list we're iterating over.
                Cache the next event in the bus because nextEvent_mixer gets reset
                when removing the event from the bus.
              */
-            kwlEvent* nextEvent = event->nextEvent_mixer;
+            kwlEventInstance* nextEvent = event->nextEvent_mixer;
             kwlMixBus_removeEvent(mixBus, event);
             event = nextEvent;
         }

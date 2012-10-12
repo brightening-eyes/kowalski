@@ -103,6 +103,13 @@
 			remoteGlobalIDString = C1DD3C2B1370D12B00D10AA6;
 			remoteInfo = kowalski_ios;
 		};
+		C1760F9C1620E91F0044204B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1064EB813DA3AC8001DA332 /* kowalski.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C1760F7B1620D6160044204B;
+			remoteInfo = kwltools;
+		};
 		C1F0C45413DA3E4000E05434 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C1064EB813DA3AC8001DA332 /* kowalski.xcodeproj */;
@@ -288,6 +295,7 @@
 				C1064EC513DA3AC9001DA332 /* kowalski_sdl.dylib */,
 				C1064EC713DA3AC9001DA332 /* Kowalski Demo.app */,
 				C1064EC913DA3AC9001DA332 /* libkowalski_ios.a */,
+				C1760F9D1620E91F0044204B /* kwltools */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -458,6 +466,13 @@
 			remoteRef = C1064EC813DA3AC9001DA332 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		C1760F9D1620E91F0044204B /* kwltools */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = kwltools;
+			remoteRef = C1760F9C1620E91F0044204B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -558,7 +573,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = kowalski_demo_ios_Prefix.pch;
 				INFOPLIST_FILE = "kowalski_demo_ios-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = kowalski_demo_ios;
+				SDKROOT = iphoneos5.0;
 			};
 			name = Debug;
 		};
@@ -570,7 +587,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = kowalski_demo_ios_Prefix.pch;
 				INFOPLIST_FILE = "kowalski_demo_ios-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = kowalski_demo_ios;
+				SDKROOT = iphoneos5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

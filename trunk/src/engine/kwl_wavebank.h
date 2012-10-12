@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2010-2011 Per Gantelius
+Copyright (c) 2010-2013 Per Gantelius
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -36,7 +36,7 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-struct kwlSoundEngine;
+struct kwlEngine;
 
 /** The number of bytes in the wave bank file identifier. */
 #define KWL_WAVE_BANK_BINARY_FILE_IDENTIFIER_LENGTH 9
@@ -93,7 +93,7 @@ typedef struct kwlWaveBank
  * Checks that a wave bank binary at a given path is valid with respect to 
  * currently loaded engine data.
  */    
-kwlError kwlWaveBank_verifyWaveBankBinary(struct kwlSoundEngine* engine, 
+kwlError kwlWaveBank_verifyWaveBankBinary(struct kwlEngine* engine, 
                                           const char* const waveBankPath,
                                           kwlWaveBank** waveBank);
     
@@ -102,7 +102,7 @@ kwlError kwlWaveBank_verifyWaveBankBinary(struct kwlSoundEngine* engine,
  * to be a valid wave bank data stream.
  */
 kwlError kwlWaveBank_loadAudioDataItems(kwlWaveBank* waveBank, kwlInputStream* inputStream);
-    
+
 /**
  * Load wave bank audio data from a file at a given path. If callback is not NULL, this method returns immediately and 
  * loading is performed in a separate thread and the callback gets invoked when loading finishes.
@@ -118,7 +118,7 @@ void* kwlWaveBank_loadingThreadEntryPoint(void* userData);
     
 /** */
 void kwlWaveBank_unload(kwlWaveBank* waveBank);
-    
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */    
